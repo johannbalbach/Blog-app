@@ -22,10 +22,6 @@ function sendRequest(method, url, body = null) {
   })
 }
 
-/*sendRequest('GET', requestURL)
-  .then(data => console.log(data))
-  .catch(err => console.log(err))*/
-
 const body = {
   email: 'abc@example.com',
   password: 'string1'
