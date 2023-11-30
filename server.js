@@ -4,23 +4,30 @@ const path = require('path');
 const app = express();
 const port = 5500;
 
-// Разрешить статические файлы из папки public
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// Разрешить статические файлы из папки view
+app.use('/login', express.static(path.join(__dirname, 'view')));
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, 'view', 'login.html'));
 });
 
-app.get('/registration', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'registration.html'));
+app.get('/scripts/loginFetch.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'scripts', 'loginFetch.js'));
 });
 
-//add route
+// app.use(express.static(path.join(__dirname, 'view')));
 
+// app.get('/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'view', 'index.html'));
+// });
+
+// app.get('/login', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'view', 'login.html'));
+// });
+
+// app.get('/registration', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'view', 'registration.html'));
+// });
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
