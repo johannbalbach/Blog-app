@@ -5,7 +5,6 @@ const loginBtn = document.getElementById('loginBtnMain');
 async function enterBlog(Token) {
   // сохраняем BearerToken в localStorage для использования в будущем
   localStorage.setItem('token', Token);
-
 }
 
 async function sendRequest(method, url, body = null) {
