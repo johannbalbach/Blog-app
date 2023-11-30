@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <title>Login Page</title>
+    <style>
+        body {
+            padding-top: 56px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top shadow p-3 mb-5">
+    <a class="navbar-brand h-25 ms-5" href="#">   Блог №415</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключатель навигации">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active text-dark" aria-current="page" href="#">Главная</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active" aria-current="page">Написать пост</a>
+          </li>
+        </ul>
+    </div>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-dark me-4" href="#" id="loginBtn">    Вход</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-none" href="#" id="profileBtn">Email пользователя</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<div class="container-md col-md-7 justify-content-start align-items-start mt-5">
+    <div class="container shadow p-3 mb-6 rounded-3">
+        <div class="col-12">
+            <form id="profileForm">
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="email">Email:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="fullName">ФИО:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" class="form-control" id="fullName" name="fullName" required>
+                    </div>
+                </div>        
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="phoneNumber">Номер телефона:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
+                    </div>
+                </div>    
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="gender">Пол:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select class="form-control" id="gender" name="gender">
+                            <option value="male">Мужской</option>
+                            <option value="female">Женский</option>
+                        </select>
+                    </div>
+                </div>    
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="dob">Дата рождения:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="date" class="form-control" id="dob" name="dob" required>
+                    </div>
+                </div>             
+                <div class="row mt-3 justify-content-end">
+                    <div class="col-md-auto">  
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </div>           
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="navbar fixed-bottom bg-light border-top border-3">
+    <span class="navbar-text ms-5">© 2022 – Блог №415</span>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" crossorigin="anonymous"></script>
+<script src = "../scripts/loginFetch.js"></script>>
+</body>
+</html>
