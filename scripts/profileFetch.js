@@ -45,17 +45,20 @@ async function sendRequestGET(token) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            
             document.querySelector('#email').value = data.email || '';
             document.querySelector('#fullName').value = data.fullName || '';
             document.querySelector('#dob').value = data.birthDate.toString().split('T')[0] || '';
             document.querySelector('#gender').value = data.gender || '';
             document.querySelector('#phoneNumber').value = data.phoneNumber || '';
+            return true;
         } else {
             console.error('Ошибка получения данных профиля:', response.status, response.statusText);
+            return false;
         }
     } catch (error) {
         console.error('Ошибка при выполнении GET-запроса:', error);
+        return false;
     }
   }
 
@@ -86,10 +89,7 @@ ProfileForm.addEventListener('submit', async function(event) {
 document.addEventListener('DOMContentLoaded', async function(event) {
     const token = localStorage.getItem('token');
 
-    if (!token) {
-        // Если токен отсутствует, перенаправляем пользователя на страницу логина
+    if (!sendRequestGET(token)) {
         window.location.href = 'http://localhost/login';
     }
-
-    sendRequestGET(token)
 });
