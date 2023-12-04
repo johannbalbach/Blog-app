@@ -1,16 +1,24 @@
+const postRequestURL = 'https://blog.kreosoft.space/api/post'
+const tagRequestURL = 'https://blog.kreosoft.space/api/tag'
+const submitFilterBtn = document.getElementById(SubmitFilterBtn);
+
+const pageSize = 5;
+
 document.addEventListener("DOMContentLoaded", function () {
+    const token = localStorage.getItem('token');
+
+    if (displayPosts(1, 0, pageSize, {}, token))//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
+    {
+        document.getElementById('postBtn').className = 'btn btn-primary';
+    }
     
-    displayPosts(1, 5, {});
-    document.getElementById('onlyMyCommunities').addEventListener('change', applyFilters);
-    document.getElementById('sorting').addEventListener('change', applyFilters);
+    
 });
 
-async function displayPosts(pageNumber, pageSize, filters) {
-    const apiUrl = "https://blog.kreosoft.space/api/getPosts";
-    
+async function displayPosts(filters, token = null) {
     try {
-        const response = await fetch(`${apiUrl}?page=${pageNumber}&pageSize=${pageSize}`, {
-            method: "POST",
+        const response = await fetch(generateApiUrl(filters), {
+            method: "GET", 
             headers: {
                 "Content-Type": "application/json",
             },
@@ -68,9 +76,9 @@ function scrollToComments() {
     // Scroll to the comments section
 }
 
-function applyFilters() {
-    const pageNumber = 1; // Reset to the first page when filters are applied
-    const pageSize = 5;
+SubmitFilterBtn.addEventListener('submit', async function(e) {
+    const pageNumber = 1;
+    const pageSize = pageSize;
     const tags = document.getElementById('tags').value;
     const authorName = document.getElementById('authorName').value;
     const readingTimeFrom = document.getElementById('readingTimeFrom').value;
@@ -79,6 +87,8 @@ function applyFilters() {
     const sorting = document.getElementById('sorting').value;
 
     const filters = {
+        pageNumber,
+        pageSize,
         tags,
         authorName,
         readingTimeFrom,
@@ -87,5 +97,48 @@ function applyFilters() {
         sorting,
     };
 
-    displayPosts(pageNumber, pageSize, filters);
-}
+    displayPosts(filters);
+})
+
+function generateApiUrl(filters) {
+    const baseUrl = "https://blog.kreosoft.space/api/post";
+    const queryParams = [];
+  
+    if (filters.tags) {
+      filters.tags.forEach(tag => {
+        queryParams.push(`tags=${tag}`);
+      });
+    }
+  
+    if (filters.authorName) {
+      queryParams.push(`author=${encodeURIComponent(filters.authorName)}`);
+    }
+  
+    if (filters.readingTimeFrom !== undefined) {
+      queryParams.push(`min=${filters.readingTimeFrom}`);
+    }
+  
+    if (filters.readingTimeTo !== undefined) {
+      queryParams.push(`max=${filters.readingTimeTo}`);
+    }
+  
+    if (filters.sorting) {
+      queryParams.push(`sorting=${filters.sorting}`);
+    }
+  
+    if (filters.onlyMyCommunities !== undefined) {
+      queryParams.push(`onlyMyCommunities=${filters.onlyMyCommunities}`);
+    }
+  
+    if (filters.pageNumber !== undefined) {
+      queryParams.push(`page=${filters.pageNumber}`);
+    }
+  
+    if (filters.pageSize !== undefined) {
+      queryParams.push(`size=${filters.pageSize}`);
+    }
+  
+    const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
+  
+    return apiUrl;
+  }

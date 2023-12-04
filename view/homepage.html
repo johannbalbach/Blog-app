@@ -50,7 +50,7 @@
     <div class="container-md col-md-8 justify-content-start align-items-start mt-5 ">
         <div class="row mt-3 justify-content-end mb-2">
             <div class="col-auto">  
-                <button type="submit" class="btn btn-primary" id="PostBtn">Написать пост</button>
+                <button type="submit" class="btn btn-primary d-none" id="PostBtn" >Написать пост</button>
             </div>
         </div>
         <div class="container-md col-auto rounded-3 mb-6 border border-2">
@@ -60,12 +60,12 @@
             <form id="filterForm" novalidate>
                 <div class="row mb-3">
                     <div class="col-md-6 ">
-                        <label for="exampleFormControlInput1" class="form-label">Поиск по имени автора</label>
-                        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="имя_автора">
+                        <label for="authorName" class="form-label">Поиск по имени автора</label>
+                        <input type="email" class="form-control" id="authorName" placeholder="имя_автора">
                     </div>
                     <div class="col-md-6">
-                        <label for="exampleFormControlInput2" class="form-label">Поиск по тэгам</label>
-                        <select class="form-select" multiple aria-label="multiple select example" id="exampleFormControlInput2">
+                        <label for="tags" class="form-label">Поиск по тэгам</label>
+                        <select class="form-select" multiple aria-label="multiple select example" id="tags">
                             <option selected>Open this select menu</option>
                             <option value="1">One</option>
                             <option value="2">Two</option>
@@ -80,8 +80,8 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6 col-lg-4 mb-2 mt-auto">
-                        <label for="filter-sort-select" class="form-label">Сортировать</label>
-                        <select class="form-select" id="filter-sort-select" autocompleted="">
+                        <label for="sorting" class="form-label">Сортировать</label>
+                        <select class="form-select" id="sorting" autocompleted="">
                           <option value="1" selected="">---</option>
                           <option value="2">По дате создания(сначала новые)</option>
                           <option value="3">По дате создания(сначала старые)</option>
@@ -90,22 +90,22 @@
                         </select>
                     </div>
                     <div class="col-md-3 col-lg-2 mb-2 mt-auto">
-                        <label for="exampleFormControlInput3" class="form-label">Время чтения от</label>
-                        <input type="email" class="form-control" id="exampleFormControlInput3">
+                        <label for="readingTimeFrom" class="form-label">Время чтения от</label>
+                        <input type="email" class="form-control" id="readingTimeFrom">
                     </div>
                     <div class="col-md-3 col-lg-2 mb-2 mt-auto">
-                        <label for="exampleFormControlInput4" class="form-label">Время чтения до</label>
-                        <input type="email" class="form-control" id="exampleFormControlInput4">
+                        <label for="readingTimeTo" class="form-label">Время чтения до</label>
+                        <input type="email" class="form-control" id="readingTimeTo">
                     </div>
                     <div class="col-md-auto mt-auto mb-2 mt-auto">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="mygroups">
-                            <label class="form-check-label" for="mygroups">Только мои группы</label>
+                            <input class="form-check-input" type="checkbox" id="onlyMyCommunities">
+                            <label class="form-check-label" for="onlyMyCommunities">Только мои группы</label>
                         </div>
                     </div>
                     <div class="col-md-auto mb-2 mt-auto justify-content-end">
                         <div class="col-auto col-12">  
-                            <button type="submitSort" class="btn btn-primary" id="SortBtn">Применить</button>
+                            <button type="submit" class="btn btn-primary" id="SubmitFilterBtn">Применить</button>
                         </div>
                     </div>
                 </div>
