@@ -1,18 +1,67 @@
-const SubmitFilter = document.getElementById('filterForm');
-
-const defaultPageSize = 5;
+const submitFilter = document.getElementById('filterForm');
+const pageSizer = document.getElementById('pageSize');
+const pagination = document.getElementById('pagination');
+const leftPage = document.getElementById('leftPage');
+const rightPage = document.getElementById('rightPage');
+const firstPage = document.getElementById('firstPage');
+const secondPage = document.getElementById('secondPage');
+const thirdPage = document.getElementById('thirdPage');
 
 document.addEventListener("DOMContentLoaded", function () {
-    const token = localStorage.getItem('token');
+    const { page, pageSize } = getUrlParams();
 
-    if (fetchPosts(getFilters(), token))//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
+    pageSizer.value = pageSize;
+
+    if (fetchPosts(getFilters(page, pageSize)))//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
     {
         document.getElementById('PostBtn').className = 'btn btn-primary';
     }
+
+    updatePagination(page);
     GetTags();
 });
 
-async function fetchPosts(filters, token = null) {
+submitFilter.addEventListener('submit', async function(event) {
+    const { page, pageSize } = getUrlParams();
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    fetchPosts(getFilters(page, pageSize));
+})
+
+pageSizer.addEventListener('change', async function(event) {
+    const { page } = getUrlParams();
+    updateUrlParams(page, event.target.value);
+
+    fetchPosts(getFilters(page, event.target.value));
+})
+
+leftPage.addEventListener('click', function (event) {
+    const { page, pageSize } = getUrlParams();
+    let currentPage = page;
+    if (currentPage > 1) {
+        updateUrlParams(--currentPage, pageSize);
+        updatePagination(currentPage);
+        fetchPosts(getFilters(currentPage, pageSize));
+    }
+});
+
+rightPage.addEventListener('click', function (event) {
+    const { page, pageSize } = getUrlParams();
+    let currentPage = page;
+    if (fetchPosts(getFilters(parseInt(currentPage)+2, pageSize)) == 0){
+        console.log("LIMIT");
+    }
+    if (fetchPosts(getFilters(currentPage++, pageSize))){
+        updateUrlParams(currentPage, pageSize)
+        updatePagination(currentPage);
+    }
+});
+
+
+async function fetchPosts(filters) {
+    const token = localStorage.getItem('token');
     try {
         const response = await fetch(generateApiUrl(filters), {
             method: "GET", 
@@ -21,12 +70,10 @@ async function fetchPosts(filters, token = null) {
                 "Content-Type": "application/json",
             },
         });
-
         if (response.ok) {
             const posts = await response.json();
-            console.log(posts);
             updatePostsUI(posts.posts);
-            return true;
+            return posts.posts;
         } else {
             console.error("Ошибка получения данных постов:", response.status, response.statusText);
             return false;
@@ -102,60 +149,82 @@ function updatePostsUI(posts) {
     postsContainer.innerHTML = '';
 
     posts.forEach(post => {
-      const postElement = document.createElement("div");
-      postElement.className = "container-md col-auto border border-2 mb-4";
-  
-      postElement.innerHTML = `
-      <div class="row-cols-auto border-bottom border-2 mt-2">
-        <div class="row mt-auto mb-3">
-            <div class="col-md-12 text-start">
-                <div class="text-dark">${post.author} - ${new Date(post.createTime).toLocaleString()} в сообществе "${post.communityName || 'Без сообщества'}"</div>
-            </div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-12 text-start">
-                <h5 class="text-dark h-75">${post.title}</h5>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="row mt-2 col-md-auto text-start">
-                <div class="text-dark">${post.description}</div>
-                <div class="row mt-auto text-start">
-                    <a class="d-none">Читать полностью</a>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-1">
-            <div class="col-md-auto">
-                <div class="col-md-12 text-start">
-                    <div class="text-dark">#${post.tags.map(tag => tag.name).join(' #')}</div>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-1">
-            <div class="col-md-auto">
-                <div class="col-md-12 text-start">
-                    <div class="text-dark">Время чтения: ${post.readingTime} мин. </div>
-                </div>
-            </div>
-        </div>
-        <div class="row bg-light border-top border-2 mt-2">
-            <div class="col-md-auto">
+        const postElement = document.createElement("div");
+        postElement.className = "container-md col-auto border border-2 mb-4";
+        const headerElement = document.createElement("div");
+        headerElement.className = "row-cols-auto border-bottom border-2 mt-2";
+        const authorElement = document.createElement("div");
+        authorElement.className = "row mt-auto mb-3";
+
+        const authorText = document.createElement("div");
+        authorText.className = "col-md-12 text-start";
+        if (post.communityName){
+            authorText.innerHTML = `<div class="text-dark">${post.author} - ${new Date(post.createTime).toLocaleString()} в сообществе "${post.communityName}"</div>`;
+        }
+        else{
+            authorText.innerHTML = `<div class="text-dark">${post.author} - ${new Date(post.createTime).toLocaleString()}</div>`;
+        }
+       
+        authorElement.appendChild(authorText);
+
+    
+        const titleElement = document.createElement("div");
+        titleElement.className = "row mb-2";
+        const titleText = document.createElement("div");
+        titleText.className = "col-md-12 text-start";
+        titleText.innerHTML = `<h5 class="text-dark h-75">${post.title}</h5>`;
+        titleElement.appendChild(titleText);
+    
+        const descriptionElement = document.createElement("div");
+        descriptionElement.className = "row mb-3";
+        const descriptionText = document.createElement("div");
+        descriptionText.className = "row mt-2 col-md-auto text-start";
+        descriptionText.innerHTML = `<div class="text-dark">${post.description}</div>`;
+        const readMoreElement = document.createElement("div");
+        readMoreElement.className = "row mt-auto text-start";
+        readMoreElement.innerHTML = `<a class="d-none">Читать полностью</a>`;
+
+        descriptionText.appendChild(readMoreElement);
+        descriptionElement.appendChild(descriptionText);
+    
+        const tagsElement = document.createElement("div");
+        tagsElement.className = "row mb-1";
+        const tagsText = document.createElement("div");
+        tagsText.className = "col-md-auto";
+        tagsText.innerHTML = `<div class="col-md-12 text-start"><div class="text-dark">#${post.tags.map(tag => tag.name).join(' #')}</div></div>`;
+        tagsElement.appendChild(tagsText);
+    
+        const readingTimeElement = document.createElement("div");
+        readingTimeElement.className = "row mb-1";
+        const readingTimeText = document.createElement("div");
+        readingTimeText.className = "col-md-auto";
+        readingTimeText.innerHTML = `<div class="col-md-12 text-start"><div class="text-dark">Время чтения: ${post.readingTime} мин. </div></div>`;
+        readingTimeElement.appendChild(readingTimeText);
+    
+        const statsElement = document.createElement("div");
+        statsElement.className = "row bg-light border-top border-2 mt-2";
+        statsElement.innerHTML = `
+            <div class="col-md-auto mt-1 mb-1">
                 <i class="fa-regular fa-comment"> ${post.commentsCount}</i>
             </div>
-            <div class="col-md-auto">
+            <div class="col-md-auto mt-1 mb-1">
                 <i class="fa-regular fa-heart"> ${post.likes}</i>
             </div>
-        </div>
-        </div>
-      `;
-  
-      postsContainer.appendChild(postElement);
-});
+        `;
+    
+        postElement.appendChild(headerElement);
+        headerElement.appendChild(authorElement);
+        headerElement.appendChild(titleElement);
+        postElement.appendChild(descriptionElement);
+        postElement.appendChild(tagsElement);
+        postElement.appendChild(readingTimeElement);
+        postElement.appendChild(statsElement);
+    
+        postsContainer.appendChild(postElement);
+    });
 }
 
 function UpdateTags(tags){
-    console.log(tags);
     const tagMenu = document.getElementById('tags');
     tagMenu.innerHTML = '';
 
@@ -177,25 +246,25 @@ function generateApiUrl(filters) {
         queryParams.push(`tags=${tag}`);
       });
     }
-    if (filters.authorName) {
+    if (filters.authorName !== "") {
       queryParams.push(`author=${filters.authorName}`);
     }
-    if (filters.readingTimeFrom !== undefined) {
+    if (filters.readingTimeFrom !== "") {
       queryParams.push(`min=${filters.readingTimeFrom}`);
     }
-    if (filters.readingTimeTo !== undefined) {
+    if (filters.readingTimeTo !== "") {
       queryParams.push(`max=${filters.readingTimeTo}`);
     }
-    if (filters.sorting) {
-      queryParams.push(`sorting=${filters.sorting - 1}`);
-    }
-    if (filters.onlyMyCommunities !== undefined) {
+    if (filters.sorting !== "" && filters.sorting != "0") {
+      queryParams.push(`sorting=${filters.sorting}`);
+    }   
+    if (filters.onlyMyCommunities) {
       queryParams.push(`onlyMyCommunities=${filters.onlyMyCommunities}`);
     }
-    if (filters.pageNumber !== undefined) {
+    if (filters.pageNumber !== "") {
       queryParams.push(`page=${filters.pageNumber}`);
     }
-    if (filters.pageSize !== undefined) {
+    if (filters.pageSize !== "") {
       queryParams.push(`size=${filters.pageSize}`);
     }
     const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
@@ -204,7 +273,7 @@ function generateApiUrl(filters) {
     return apiUrl;
   }
 
-function getFilters(pageNumber = 1, pageSize = defaultPageSize)
+function getFilters(pageNumber = 1, pageSize = getUrlParams().pageSize)
 {
     const tags = Array.from(document.getElementById('tags').selectedOptions).map(option => option.value);
     const authorName = document.getElementById('authorName').value;
@@ -226,11 +295,34 @@ function getFilters(pageNumber = 1, pageSize = defaultPageSize)
     return filters;
 }
 
-SubmitFilter.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    event.stopPropagation();
+function updateUrlParams(page, pageSize) {
+    const url = new URL(window.location);
+    url.searchParams.set('page', page);
+    url.searchParams.set('pageSize', pageSize);
+    window.history.pushState({}, '', url);
+}
+  
+function getUrlParams() {
+    const url = new URL(window.location);
+    const page = url.searchParams.get('page') || 1;
+    const pageSize = url.searchParams.get('pageSize') || 5;
+    return { page, pageSize };
+}
 
-    const token = localStorage.getItem('token');
+function updatePagination(currentPage) {
+    firstPage.innerHTML = '';
+    secondPage.innerHTML = '';
+    thirdPage.innerHTML = '';
 
-    fetchPosts(getFilters(), token);
-})
+    firstPage.innerHTML = currentPage;
+    secondPage.innerHTML = ++currentPage;
+    thirdPage.innerHTML = ++currentPage;
+
+    if (currentPage == 3) {
+        leftPage.parentElement.classList.add('disabled');
+    } else {
+        leftPage.parentElement.classList.remove('disabled');
+    }
+}
+
+  
