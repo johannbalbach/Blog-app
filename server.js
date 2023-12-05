@@ -15,19 +15,19 @@ app.get('/scripts/loginFetch.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'scripts', 'loginFetch.js'));
 });
 
-// app.use(express.static(path.join(__dirname, 'view')));
+app.use(express.static(path.join(__dirname, 'view')));
 
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'view', 'index.html'));
-// });
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'view', 'index.html'));
+});
 
-// app.get('/login', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'view', 'login.html'));
-// });
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'view', 'login.html'));
+});
 
-// app.get('/registration', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'view', 'registration.html'));
-// });
+app.get('/registration', (req, res) => {
+    res.sendFile(path.join(__dirname, 'view', 'registration.html'));
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
