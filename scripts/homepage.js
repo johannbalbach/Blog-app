@@ -7,17 +7,31 @@ const firstPage = document.getElementById('firstPage');
 const secondPage = document.getElementById('secondPage');
 const thirdPage = document.getElementById('thirdPage');
 
-document.addEventListener("DOMContentLoaded", function () {
+let maxPages = 1;
+
+document.addEventListener("DOMContentLoaded", async function () {
     const { page, pageSize } = getUrlParams();
 
     pageSizer.value = pageSize;
 
-    if (fetchPosts(getFilters(page, pageSize)))//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
+    if (true)//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
     {
         document.getElementById('PostBtn').className = 'btn btn-primary';
     }
+    await fetchPosts(getFilters(page, pageSize))
 
-    updatePagination(page);
+    if (parseInt(page) % 3 === 0){
+        updatePagination(page - 2);
+        updateActivePage(page);
+    }
+    if (parseInt(page) % 3 === 1){
+        updatePagination(parseInt(page));
+        updateActivePage(page);
+    }
+    if (parseInt(page) % 3 === 2){
+        updatePagination(parseInt(page) - 1);
+        updateActivePage(page);
+    }
     GetTags();
 });
 
@@ -41,24 +55,50 @@ leftPage.addEventListener('click', function (event) {
     const { page, pageSize } = getUrlParams();
     let currentPage = page;
     if (currentPage > 1) {
-        updateUrlParams(--currentPage, pageSize);
-        updatePagination(currentPage);
-        fetchPosts(getFilters(currentPage, pageSize));
+        updatePage(--currentPage, pageSize)
     }
 });
 
 rightPage.addEventListener('click', function (event) {
     const { page, pageSize } = getUrlParams();
     let currentPage = page;
-    if (fetchPosts(getFilters(parseInt(currentPage)+2, pageSize)) == 0){
-        console.log("LIMIT");
-    }
-    if (fetchPosts(getFilters(currentPage++, pageSize))){
-        updateUrlParams(currentPage, pageSize)
-        updatePagination(currentPage);
+
+    //сделать проверку на макс число постов
+    updatePage(++currentPage, pageSize)
+});
+
+firstPage.addEventListener('click', function (event) {
+    const { page, pageSize } = getUrlParams();
+    let currentPage = page;
+    let difference = parseInt(currentPage) - parseInt(this.innerHTML);
+    if (difference > 0) {
+        currentPage = parseInt(currentPage) - difference;
+        
+        updatePage(currentPage, pageSize)
     }
 });
 
+secondPage.addEventListener('click', function (event) {
+    const { page, pageSize } = getUrlParams();
+    let currentPage = page;
+    let difference = parseInt(this.innerHTML) - parseInt(currentPage);
+
+    currentPage = parseInt(currentPage) + difference;
+
+    updatePage(currentPage, pageSize)
+});
+
+thirdPage.addEventListener('click', function (event) {
+    const { page, pageSize } = getUrlParams();
+    let currentPage = page;
+    let difference = parseInt(this.innerHTML) - parseInt(currentPage);
+
+    if (difference > 0) {
+        currentPage = parseInt(currentPage) + difference;
+
+        updatePage(currentPage, pageSize)
+    }
+});
 
 async function fetchPosts(filters) {
     const token = localStorage.getItem('token');
@@ -72,8 +112,9 @@ async function fetchPosts(filters) {
         });
         if (response.ok) {
             const posts = await response.json();
+
             updatePostsUI(posts.posts);
-            return posts.posts;
+            maxPages = posts.pagination.count;
         } else {
             console.error("Ошибка получения данных постов:", response.status, response.statusText);
             return false;
@@ -175,17 +216,36 @@ function updatePostsUI(posts) {
         titleText.innerHTML = `<h5 class="text-dark h-75">${post.title}</h5>`;
         titleElement.appendChild(titleText);
     
+        
         const descriptionElement = document.createElement("div");
-        descriptionElement.className = "row mb-3";
+        descriptionElement.className = "row mb-2";
+
         const descriptionText = document.createElement("div");
         descriptionText.className = "row mt-2 col-md-auto text-start";
-        descriptionText.innerHTML = `<div class="text-dark">${post.description}</div>`;
+
+        const truncatedDescription = post.description.length > 200
+            ? post.description.slice(0, 200) + "..."
+            : post.description;
+
+        descriptionText.innerHTML = `<div class="text-dark">${truncatedDescription}</div>`;
+
         const readMoreElement = document.createElement("div");
-        readMoreElement.className = "row mt-auto text-start";
-        readMoreElement.innerHTML = `<a class="d-none">Читать полностью</a>`;
+        readMoreElement.className = "row mt-auto justify-content-start";
+
+        if (post.description.length > 200) {
+            const showMoreButton = document.createElement("button");
+            showMoreButton.className = "btn btn-link text-start";
+            showMoreButton.textContent = "Показать полностью";
+            showMoreButton.addEventListener("click", () => {
+                descriptionText.innerHTML = `<div class="text-dark">${post.description}</div>`;
+                readMoreElement.style.display = "none";
+            });
+            readMoreElement.appendChild(showMoreButton);
+        }
 
         descriptionText.appendChild(readMoreElement);
         descriptionElement.appendChild(descriptionText);
+
     
         const tagsElement = document.createElement("div");
         tagsElement.className = "row mb-1";
@@ -269,7 +329,6 @@ function generateApiUrl(filters) {
     }
     const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
   
-    console.log(apiUrl);
     return apiUrl;
   }
 
@@ -310,19 +369,62 @@ function getUrlParams() {
 }
 
 function updatePagination(currentPage) {
-    firstPage.innerHTML = '';
-    secondPage.innerHTML = '';
-    thirdPage.innerHTML = '';
+    if (parseInt(currentPage) > parseInt(thirdPage.innerHTML)){
+        firstPage.innerHTML = currentPage;
+        secondPage.innerHTML = parseInt(currentPage) + 1;
+        thirdPage.innerHTML = parseInt(currentPage) + 2;
+    }
+    else if (parseInt(currentPage) < parseInt(firstPage.innerHTML)){
+        firstPage.innerHTML = parseInt(currentPage) - 2;
+        secondPage.innerHTML = parseInt(currentPage) - 1;
+        thirdPage.innerHTML = currentPage;
+    }
+}
 
-    firstPage.innerHTML = currentPage;
-    secondPage.innerHTML = ++currentPage;
-    thirdPage.innerHTML = ++currentPage;
+function updateActivePage(currentPage){
+    if (currentPage == firstPage.innerHTML){
+        firstPage.parentElement.className = 'page-item active';
+        secondPage.parentElement.className = 'page-item';
+        thirdPage.parentElement.className = 'page-item';
+    }   
+    else if (currentPage == secondPage.innerHTML){
+        secondPage.parentElement.className = 'page-item active';
+        firstPage.parentElement.className = 'page-item';
+        thirdPage.parentElement.className = 'page-item';
+    }
+    else if (currentPage == thirdPage.innerHTML){
+        thirdPage.parentElement.className = 'page-item active';
+        secondPage.parentElement.className = 'page-item';
+        firstPage.parentElement.className = 'page-item';
+    }
 
-    if (currentPage == 3) {
+    if (maxPages == firstPage.innerHTML){
+        firstPage.parentElement.className = firstPage.parentElement.className + ' disabled';
+    }
+    if (maxPages == secondPage.innerHTML){
+        secondPage.parentElement.className = secondPage.parentElement.className + ' disabled';
+    }
+    if (maxPages == thirdPage.innerHTML){
+        thirdPage.parentElement.className = thirdPage.parentElement.className + ' disabled';
+    }
+
+    if (currentPage == 1) {
         leftPage.parentElement.classList.add('disabled');
     } else {
         leftPage.parentElement.classList.remove('disabled');
     }
+    if (currentPage == maxPages - 1) {
+        rightPage.parentElement.classList.add('disabled');
+    } else {
+        rightPage.parentElement.classList.remove('disabled');
+    }
+}
+
+function updatePage(currentPage, currentSize){
+    updateUrlParams(currentPage, currentSize);
+    updatePagination(currentPage);
+    updateActivePage(currentPage);
+    fetchPosts(getFilters(currentPage, currentSize));
 }
 
   
