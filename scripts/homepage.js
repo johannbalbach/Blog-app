@@ -11,6 +11,9 @@ let maxPages = 1;
 
 document.addEventListener("DOMContentLoaded", async function () {
     const { page, pageSize } = getUrlParams();
+    await GetTags();
+
+    setFilters(getFiltersFromURL());
 
     pageSizer.value = pageSize;
 
@@ -18,6 +21,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     {
         document.getElementById('PostBtn').className = 'btn btn-primary';
     }
+    
     await fetchPosts(getFilters(page, pageSize))
 
     if (parseInt(page) % 3 === 0){
@@ -32,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         updatePagination(parseInt(page) - 1);
         updateActivePage(page);
     }
-    GetTags();
 });
 
 submitFilter.addEventListener('submit', async function(event) {
@@ -42,6 +45,7 @@ submitFilter.addEventListener('submit', async function(event) {
     event.stopPropagation();
 
     fetchPosts(getFilters(page, pageSize));
+    updatePage(page, pageSize);
 })
 
 pageSizer.addEventListener('change', async function(event) {
@@ -172,16 +176,11 @@ async function handleLike(postId, IsitAdd) {
 }
 
 function showFullPost(postId) {
-    // Display the full text of the post
-    // Update the UI to hide the "Show more" button
+
 }
 
 function goToPost(postId) {
-    // Redirect to the individual post page using the postId
-}
 
-function scrollToComments() {
-    // Scroll to the comments section
 }
 
 function updatePostsUI(posts) {
@@ -328,7 +327,7 @@ function generateApiUrl(filters) {
       queryParams.push(`size=${filters.pageSize}`);
     }
     const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
-  
+
     return apiUrl;
   }
 
@@ -354,10 +353,54 @@ function getFilters(pageNumber = 1, pageSize = getUrlParams().pageSize)
     return filters;
 }
 
+function setFilters(filters)
+{
+    const tagsSelect = document.getElementById('tags');
+    for (let i = 0; i < tagsSelect.options.length; i++) {
+        if (filters.tags.includes(tagsSelect.options[i].value)) {
+            tagsSelect.options[i].selected = true;
+        }
+    }
+    document.getElementById('authorName').value = filters.authorName;
+    document.getElementById('readingTimeFrom').value = filters.readingTimeFrom;
+    document.getElementById('readingTimeTo').value = filters.readingTimeTo;
+    document.getElementById('onlyMyCommunities').checked = filters.onlyMyCommunities;
+    document.getElementById('sorting').value = filters.sorting;
+}
+
 function updateUrlParams(page, pageSize) {
     const url = new URL(window.location);
     url.searchParams.set('page', page);
     url.searchParams.set('pageSize', pageSize);
+    const filters = getFilters(page, pageSize);
+
+    if (filters.tags) {
+        const existingTags = url.searchParams.getAll('tags');
+        const uniqueTagsSet = new Set([...existingTags, ...filters.tags]);//распыление
+        const uniqueTagsArray = Array.from(uniqueTagsSet);
+
+        url.searchParams.delete('tags');
+        
+        uniqueTagsArray.forEach(tag => {
+            url.searchParams.append('tags', tag);
+        });
+    }
+    if (filters.authorName !== "") {
+    url.searchParams.set('author', filters.authorName)
+    }
+    if (filters.readingTimeFrom !== "") {
+    url.searchParams.set('readingTimeFrom', filters.readingTimeFrom)
+    }
+    if (filters.readingTimeTo !== "") {
+    url.searchParams.set('readingTimeTo', filters.readingTimeTo)
+    }
+    if (filters.sorting !== "" && filters.sorting != "0") {
+    url.searchParams.set('sorting', filters.sorting)
+    }   
+    if (filters.onlyMyCommunities) {
+    url.searchParams.set('OnlyMyCommunities', filters.onlyMyCommunities)
+    }
+    
     window.history.pushState({}, '', url);
 }
   
@@ -366,6 +409,27 @@ function getUrlParams() {
     const page = url.searchParams.get('page') || 1;
     const pageSize = url.searchParams.get('pageSize') || 5;
     return { page, pageSize };
+}
+
+function getFiltersFromURL(){
+    const url = new URL(window.location);
+    const tags = url.searchParams.getAll('tags');
+    const authorName = url.searchParams.get('author');
+    const readingTimeFrom = url.searchParams.get('readingTimeFrom') || '';
+    const readingTimeTo = url.searchParams.get('readingTimeTo') || '';
+    const onlyMyCommunities = url.searchParams.get('OnlyMyCommunities');
+    const sorting = url.searchParams.get('sorting') || '0';
+
+    const filters = {
+        tags,
+        authorName,
+        readingTimeFrom,
+        readingTimeTo,
+        onlyMyCommunities,
+        sorting,
+    };
+
+    return filters;
 }
 
 function updatePagination(currentPage) {
