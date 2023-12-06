@@ -1,0 +1,585 @@
+<div id="ExtendedSearchPlaceHolder">
+    <script>
+        function GetAddressType() {
+            return parseInt($("input[name='SelectAddressType']:checked").val());
+        }
+    
+        var Path = [];
+    
+        var SelectedObject = null;
+    
+        function OnLevelSelected(level, address) {
+            if (address === undefined) address = null;
+    
+            for (var i = level; i <= 17; i++) {
+                if (Path[i] !== undefined) Path[i] = undefined;
+            }
+    
+            var id = (address != null) ? address.object_id : null;
+    
+            if (id != null) {
+                Path[level] = id;
+            }
+    
+            SelectedObject = address;
+    
+            LoadLevels(DistrictLevel, 'District');
+    
+            if (AddressType == 2) {
+                LoadLevels(4, 'CitySettelment');
+                LoadLevels(5, 'City', [2, 5]);
+            }
+            else {
+                Path[4] == undefined;
+                DrawSelect([], 'CitySettelment');
+                LoadLevels(5, 'City');
+            }
+    
+            LoadLevels(6, 'Settelment');
+            LoadLevels(7, 'PlanningStructure');
+            LoadLevels(8, 'Street');
+            LoadLevels(9, 'Stead');
+            LoadLevels(10, 'House');
+            LoadLevels(11, 'Apartment');
+            LoadLevels(12, 'Room');
+            LoadLevels(17, 'CarPlace');
+        }
+    
+        var DistrictLevel = 3;
+    
+        function LoadLevels(level, name, levels) {
+            var topLevel = 0;
+            for (var i = 17; i > 0; i--) {
+                if (Path[i] !== undefined) {
+                    topLevel = i;
+                    break;
+                }
+            }
+    
+            if (Path[level] !== undefined) return;
+    
+            var div = $('#' + name + 'Div');
+            var sel = $('#' + name + 'Input');
+    
+            if (level < topLevel) {
+                sel.val('');
+                div.slideUp(500);
+                return;
+            }
+    
+            var loadTimeout = setTimeout(function () {
+                sel.val('Загрузка данных ...');
+                sel.prop('disabled', true);
+                div.slideDown(200);
+            }, 1000);
+    
+            if (levels == undefined) levels = [ level ];
+    
+            GetAddressItems(
+                {
+                    address_levels: levels,
+                    address_type: AddressType,
+                    path: BuildPath()
+                },
+                function (addresses) {
+                    clearTimeout(loadTimeout);
+                    sel.val('');
+                    sel.prop('disabled', false);
+    
+                    DrawSelect(addresses, name);
+                }
+            );
+        }
+    
+        function DrawSelect(addresses, name) {
+            var div = $('#' + name + 'Div');
+    
+            if (addresses.length > 0) {
+                addresses.sort(CompareAddressItems);
+    
+                GetItemsFromAddresses(
+                    name,
+                    addresses,
+                    address => GetObjectLastHierarchyItem(address).full_name_short
+                );
+    
+                div.slideDown(500);
+            }
+            else {
+                GetItemsFromAddresses(name);
+    
+                div.slideUp(500);
+            }
+        }
+    
+        function BuildPath() {
+            var result = '';
+            $.each(Path, function (i, value) {
+                if (value === undefined) return;
+                if (result.length > 0) result = result + '.';
+                result = result + value;
+            });
+            return result;
+        }
+    </script>
+    <div class="form-group form-group-lg_inline mt-3" id="RegionDiv">
+        <label class="form-group__label w-lg-30">
+            Субъект РФ
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="RegionInput" placeholder="Выберите регион">
+        <div class="form-control-dropdown" style="height: 200px; top: 40px; display: none;" wfd-invisible="true" id="RegionHintsDiv">
+            <ul id="RegionHints" class="form-control-dropdown__list"><li onclick="OnDropDownHintClick('Region', 0);" class="form-control-dropdown__list-item" id="RegionHint0">14 Республика Саха (Якутия)</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#RegionInput'); 
+    
+        DropDown['Region'] = { 
+            Id: 'Region',
+            Items: [],
+            Div: $('#RegionHintsDiv'),
+            Input: input,
+            Hints: $('#RegionHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    
+    <div class="form-group form-group-lg_inline mt-3" style="" id="DistrictDiv">
+        <label class="form-group__label w-lg-30" id="DistrictLabel">
+            Муниципальный район/округ
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="DistrictInput" placeholder="Выберите район">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="DistrictHintsDiv">
+            <ul id="DistrictHints" class="form-control-dropdown__list"><li onclick="OnDropDownHintClick('District', 0);" class="form-control-dropdown__list-item" id="DistrictHint0">г.о. Жатай</li><li onclick="OnDropDownHintClick('District', 1);" class="form-control-dropdown__list-item" id="DistrictHint1">г.о. город Якутск</li><li onclick="OnDropDownHintClick('District', 2);" class="form-control-dropdown__list-item" id="DistrictHint2">м.р-н Абыйский</li><li onclick="OnDropDownHintClick('District', 3);" class="form-control-dropdown__list-item" id="DistrictHint3">м.р-н Алданский</li><li onclick="OnDropDownHintClick('District', 4);" class="form-control-dropdown__list-item" id="DistrictHint4">м.р-н Аллаиховский</li><li onclick="OnDropDownHintClick('District', 5);" class="form-control-dropdown__list-item" id="DistrictHint5">м.р-н Амгинский</li><li onclick="OnDropDownHintClick('District', 6);" class="form-control-dropdown__list-item" id="DistrictHint6">м.р-н Анабарский национальный (долгано-эвенкийский)</li><li onclick="OnDropDownHintClick('District', 7);" class="form-control-dropdown__list-item" id="DistrictHint7">м.р-н Булунский</li><li onclick="OnDropDownHintClick('District', 8);" class="form-control-dropdown__list-item" id="DistrictHint8">м.р-н Верхневилюйский</li><li onclick="OnDropDownHintClick('District', 9);" class="form-control-dropdown__list-item" id="DistrictHint9">м.р-н Верхнеколымский</li><li onclick="OnDropDownHintClick('District', 10);" class="form-control-dropdown__list-item" id="DistrictHint10">м.р-н Верхоянский</li><li onclick="OnDropDownHintClick('District', 11);" class="form-control-dropdown__list-item" id="DistrictHint11">м.р-н Вилюйский</li><li onclick="OnDropDownHintClick('District', 12);" class="form-control-dropdown__list-item" id="DistrictHint12">м.р-н Горный</li><li onclick="OnDropDownHintClick('District', 13);" class="form-control-dropdown__list-item" id="DistrictHint13">м.р-н Жиганский национальный эвенкийский</li><li onclick="OnDropDownHintClick('District', 14);" class="form-control-dropdown__list-item" id="DistrictHint14">м.р-н Кобяйский</li><li onclick="OnDropDownHintClick('District', 15);" class="form-control-dropdown__list-item" id="DistrictHint15">м.р-н Ленский</li><li onclick="OnDropDownHintClick('District', 16);" class="form-control-dropdown__list-item" id="DistrictHint16">м.р-н Мегино-Кангаласский</li><li onclick="OnDropDownHintClick('District', 17);" class="form-control-dropdown__list-item" id="DistrictHint17">м.р-н Мирнинский</li><li onclick="OnDropDownHintClick('District', 18);" class="form-control-dropdown__list-item" id="DistrictHint18">м.р-н Момский</li><li onclick="OnDropDownHintClick('District', 19);" class="form-control-dropdown__list-item" id="DistrictHint19">м.р-н Намский</li><li onclick="OnDropDownHintClick('District', 20);" class="form-control-dropdown__list-item" id="DistrictHint20">м.р-н Нерюнгринский</li><li onclick="OnDropDownHintClick('District', 21);" class="form-control-dropdown__list-item" id="DistrictHint21">м.р-н Нижнеколымский</li><li onclick="OnDropDownHintClick('District', 22);" class="form-control-dropdown__list-item" id="DistrictHint22">м.р-н Нюрбинский</li><li onclick="OnDropDownHintClick('District', 23);" class="form-control-dropdown__list-item" id="DistrictHint23">м.р-н Оймяконский</li><li onclick="OnDropDownHintClick('District', 24);" class="form-control-dropdown__list-item" id="DistrictHint24">м.р-н Олекминский</li><li onclick="OnDropDownHintClick('District', 25);" class="form-control-dropdown__list-item" id="DistrictHint25">м.р-н Оленекский эвенкийский национальный</li><li onclick="OnDropDownHintClick('District', 26);" class="form-control-dropdown__list-item" id="DistrictHint26">м.р-н Среднеколымский</li><li onclick="OnDropDownHintClick('District', 27);" class="form-control-dropdown__list-item" id="DistrictHint27">м.р-н Сунтарский</li><li onclick="OnDropDownHintClick('District', 28);" class="form-control-dropdown__list-item" id="DistrictHint28">м.р-н Таттинский</li><li onclick="OnDropDownHintClick('District', 29);" class="form-control-dropdown__list-item" id="DistrictHint29">м.р-н Томпонский</li><li onclick="OnDropDownHintClick('District', 30);" class="form-control-dropdown__list-item" id="DistrictHint30">м.р-н Усть-Алданский</li><li onclick="OnDropDownHintClick('District', 31);" class="form-control-dropdown__list-item" id="DistrictHint31">м.р-н Усть-Майский</li><li onclick="OnDropDownHintClick('District', 32);" class="form-control-dropdown__list-item" id="DistrictHint32">м.р-н Усть-Янский</li><li onclick="OnDropDownHintClick('District', 33);" class="form-control-dropdown__list-item" id="DistrictHint33">м.р-н Хангаласский</li><li onclick="OnDropDownHintClick('District', 34);" class="form-control-dropdown__list-item" id="DistrictHint34">м.р-н Чурапчинский</li><li onclick="OnDropDownHintClick('District', 35);" class="form-control-dropdown__list-item" id="DistrictHint35">м.р-н Эвено-Бытантайский национальный</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#DistrictInput'); 
+    
+        DropDown['District'] = { 
+            Id: 'District',
+            Items: [],
+            Div: $('#DistrictHintsDiv'),
+            Input: input,
+            Hints: $('#DistrictHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="CitySettelmentDiv">
+        <label class="form-group__label w-lg-30">
+            Сельское/городское поселение
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="CitySettelmentInput" placeholder="Выберите сельское/городское поселение">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="CitySettelmentHintsDiv">
+            <ul id="CitySettelmentHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#CitySettelmentInput'); 
+    
+        DropDown['CitySettelment'] = { 
+            Id: 'CitySettelment',
+            Items: [],
+            Div: $('#CitySettelmentHintsDiv'),
+            Input: input,
+            Hints: $('#CitySettelmentHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="CityDiv">
+        <label class="form-group__label w-lg-30">
+            Город
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="CityInput" placeholder="Выберите город">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="CityHintsDiv">
+            <ul id="CityHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#CityInput'); 
+    
+        DropDown['City'] = { 
+            Id: 'City',
+            Items: [],
+            Div: $('#CityHintsDiv'),
+            Input: input,
+            Hints: $('#CityHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="SettelmentDiv">
+        <label class="form-group__label w-lg-30">
+            Населенный пункт
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="SettelmentInput" placeholder="Выберите населенный пункт">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="SettelmentHintsDiv">
+            <ul id="SettelmentHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#SettelmentInput'); 
+    
+        DropDown['Settelment'] = { 
+            Id: 'Settelment',
+            Items: [],
+            Div: $('#SettelmentHintsDiv'),
+            Input: input,
+            Hints: $('#SettelmentHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="PlanningStructureDiv">
+        <label class="form-group__label w-lg-30">
+            Элемент планировочной структуры
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="PlanningStructureInput" placeholder="Выберите элемент планировочной структуры">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="PlanningStructureHintsDiv">
+            <ul id="PlanningStructureHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#PlanningStructureInput'); 
+    
+        DropDown['PlanningStructure'] = { 
+            Id: 'PlanningStructure',
+            Items: [],
+            Div: $('#PlanningStructureHintsDiv'),
+            Input: input,
+            Hints: $('#PlanningStructureHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="StreetDiv">
+        <label class="form-group__label w-lg-30">
+            Элемент улично-дорожной сети
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="StreetInput" placeholder="Выберите элемент улично-дорожной сети">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="StreetHintsDiv">
+            <ul id="StreetHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#StreetInput'); 
+    
+        DropDown['Street'] = { 
+            Id: 'Street',
+            Items: [],
+            Div: $('#StreetHintsDiv'),
+            Input: input,
+            Hints: $('#StreetHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="SteadDiv">
+        <label class="form-group__label w-lg-30">
+            Земельный участок
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="SteadInput" placeholder="Выберите земельный участок">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="SteadHintsDiv">
+            <ul id="SteadHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#SteadInput'); 
+    
+        DropDown['Stead'] = { 
+            Id: 'Stead',
+            Items: [],
+            Div: $('#SteadHintsDiv'),
+            Input: input,
+            Hints: $('#SteadHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="HouseDiv">
+        <label class="form-group__label w-lg-30">
+            Здание/сооружение
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="HouseInput" placeholder="Выберите здание/сооружение">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="HouseHintsDiv">
+            <ul id="HouseHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#HouseInput'); 
+    
+        DropDown['House'] = { 
+            Id: 'House',
+            Items: [],
+            Div: $('#HouseHintsDiv'),
+            Input: input,
+            Hints: $('#HouseHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="ApartmentDiv">
+        <label class="form-group__label w-lg-30">
+            Помещение
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="ApartmentInput" placeholder="Выберите помещение">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="ApartmentHintsDiv">
+            <ul id="ApartmentHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#ApartmentInput'); 
+    
+        DropDown['Apartment'] = { 
+            Id: 'Apartment',
+            Items: [],
+            Div: $('#ApartmentHintsDiv'),
+            Input: input,
+            Hints: $('#ApartmentHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="RoomDiv">
+        <label class="form-group__label w-lg-30">
+            Помещения в пределах помещения
+        </label>
+    
+    
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="RoomInput" placeholder="Выберите помещения в пределах помещения">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="RoomHintsDiv">
+            <ul id="RoomHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#RoomInput'); 
+    
+        DropDown['Room'] = { 
+            Id: 'Room',
+            Items: [],
+            Div: $('#RoomHintsDiv'),
+            Input: input,
+            Hints: $('#RoomHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script></div>
+    
+    <div class="form-group form-group-lg_inline mt-3" style="display: none;" id="CarPlaceDiv">
+        <label class="form-group__label w-lg-30">
+            Машино-место
+        </label>
+           
+    <div class="form-group__wrapper w-lg-70">
+        <input type="text" class="form-control" id="CarPlaceInput" placeholder="Выберите машино-место">
+        <div class="form-control-dropdown" style="height: 200px; display: none; top:40px;" wfd-invisible="true" id="CarPlaceHintsDiv">
+            <ul id="CarPlaceHints" class="form-control-dropdown__list"><li class="form-control-dropdown__list-item">Нет совпадений</li></ul>
+    </div>
+    </div>
+    
+    <script>
+        var input = $('#CarPlaceInput'); 
+    
+        DropDown['CarPlace'] = { 
+            Id: 'CarPlace',
+            Items: [],
+            Div: $('#CarPlaceHintsDiv'),
+            Input: input,
+            Hints: $('#CarPlaceHints'),
+            OnSelect: null,
+            HintSelected: -1,
+            HintCount: 0,
+            Offset: 0,
+            ScrolledLines: 5
+        };
+    
+        input.keyup(OnDropDownInputKeyUp);
+        input.keydown(OnDropDownInputKeyDown);
+        input.focusout(OnDropDownInputFocusOut);
+        input.focusin(OnDropDownInputFocusIn);
+    </script>
+    </div>
+    
+    <script>
+        DropDown['Region'].OnSelect = address => OnLevelSelected(1, address);
+        DropDown['District'].OnSelect = address => OnLevelSelected(DistrictLevel, address);
+        DropDown['CitySettelment'].OnSelect = address => OnLevelSelected(4, address);
+        DropDown['City'].OnSelect = address => OnLevelSelected(5, address);
+        DropDown['Settelment'].OnSelect = address => OnLevelSelected(6, address);
+        DropDown['PlanningStructure'].OnSelect = address => OnLevelSelected(7, address);
+        DropDown['Street'].OnSelect = address => OnLevelSelected(8, address);
+        DropDown['Stead'].OnSelect = address => OnLevelSelected(9, address);
+        DropDown['House'].OnSelect = address => OnLevelSelected(10, address);
+        DropDown['Apartment'].OnSelect = address => OnLevelSelected(11, address);
+        DropDown['Room'].OnSelect = address => OnLevelSelected(12, address);
+        DropDown['CarPlace'].OnSelect = address => OnLevelSelected(17, address);
+    
+        FillRegions();
+    
+        ClearForm = function () {
+            $('#RegionInput').val('');
+            FillRegions();
+            OnLevelSelected(1);
+            SelectedObject = null;
+        };
+    
+        GetSearchObjects = function (onData) {
+            var data = [];
+            
+            if (SelectedObject != null) data[0] = SelectedObject;
+    
+            onData(data);
+        };
+    
+        ChangeDivision = function () {
+            DistrictLevel = AddressType == 2 ? 3 : 2;
+            $('#DistrictLabel').html(AddressType == 2 ? 'Муниципальный район/округ' : 'Административный район');
+    
+            OnLevelSelected(1, DropDown['Region'].Selected);
+        };
+    </script>
+
+    </div>
