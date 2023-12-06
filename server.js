@@ -5,7 +5,8 @@ const app = express();
 const port = 5500;
 
 // Разрешить статические файлы из папки view
-app.use('/login', express.static(path.join(__dirname, 'view')));
+app.use(express.static(path.join(__dirname, 'view')));
+//app.use('/login', express.static(path.join(__dirname, 'view')));
 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'view', 'login.html'));
