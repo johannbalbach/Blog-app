@@ -21,7 +21,7 @@ async function fetchCommunities() {
     }
 }
 
-async function checkSubscribe(id) {
+async function getRoleInCommunity(id) {
     const token = localStorage.getItem('token');
     try {
         const response = await fetch(`https://blog.kreosoft.space/api/community/${id}/role`, {
@@ -45,86 +45,121 @@ async function checkSubscribe(id) {
         return false;
     }
 }
-async function handleSubscribe(id, IsItSubscribe) {
-    let subscribeURL = '';
-    let method = '';
-    const token = localStorage.getItem('token');
 
-    if (IsItSubscribe){
-        subscribeURL = `https://blog.kreosoft.space/api/community/${id}/subscribe`;
-        method = 'POST';
-    }
-    else{
-        subscribeURL = `https://blog.kreosoft.space/api/community/${id}/unsubscribe`;
-        method = 'DELETE';
-    }
+async function handleSubscribe(id) {
+    const token = localStorage.getItem('token');
+    const subscribeURL = `https://blog.kreosoft.space/api/community/${id}/subscribe`;
+
     try {
         const response = await fetch(subscribeURL, {
-            method: method,
+            method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
             }
         });
 
         if (response.ok) {
-            const answer = await response.json();
-
-            return true;
+            
         } else {
             console.error('Ошибка получения данных роли:', response.status, response.statusText);
-            return false;
         }
     } catch (error) {
-        console.error('Ошибка при выполнении GET-запроса:', error);
-        return false;
+        console.error('Ошибка при выполнении запроса:', error);
     }
 }
+
+async function handleUnsubscribe(id) {
+    const token = localStorage.getItem('token');
+    const subscribeURL = `https://blog.kreosoft.space/api/community/${id}/unsubscribe`;
+
+    try {
+        const response = await fetch(subscribeURL, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            
+        } else {
+            console.error('Ошибка получения данных роли:', response.status, response.statusText);
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении запроса:', error);
+    }
+}
+
 
 async function updateCommunitiesUI(communities) {
     const communitiesContainer = document.getElementById("communitiesContainer");
 
     communitiesContainer.innerHTML = '';
 
-    communities.forEach(community => {
+    communities.forEach(async community => {
         const communityElement = document.createElement("div");
-        communityElement.className = "container-md col-auto bg-light border border-2 mb-4";
+        communityElement.className = "container-md col-auto rounded-3 bg-light border border-2 mb-4";
 
         const communityBody = document.createElement("div");
         communityBody.className = "row mt-2";
         communityBody.innerHTML = `
-            <div class="col-md-6 mt-3 mb-3">
+            <div class="container-md col-6 mt-3 mb-3">
                 <h4 class="text-dart">${community.name}</h4>
             </div>
         `;
 
-        const subscribeBtn = createSubscribeButton(community.id, community.isSubscribed);
-        
         const subscribeBtnContainer = document.createElement("div");
-        subscribeBtnContainer.className = "col-md-6 mt-3 mb-3";
-        subscribeBtnContainer.appendChild(subscribeBtn);
+        subscribeBtnContainer.className = "container-md col-2 mt-3 mb-3 me-3 d-flex justify-content-end";
 
+        const subscribeBtn = document.createElement("button");
+        subscribeBtn.type = "button";
+        subscribeBtn.className = "btn btn-primary ms-5 d-none";
+        subscribeBtn.textContent = "Подписаться";
+
+        const unsubscribeBtn = document.createElement("button");
+        unsubscribeBtn.type = "button";
+        unsubscribeBtn.className = "btn btn-danger ms-5 d-none";
+        unsubscribeBtn.textContent = "Отписаться";
+
+        subscribeBtn.addEventListener("click", async () => {
+            unsubscribeBtn.className = "btn btn-danger ms-5";
+            subscribeBtn.className = "btn btn-primary ms-5 d-none";
+
+            await handleSubscribe(community.id);
+        });
+
+        unsubscribeBtn.addEventListener("click", async () => {
+            subscribeBtn.className = "btn btn-primary ms-5";
+            unsubscribeBtn.className = "btn btn-danger ms-5 d-none";
+
+            await handleUnsubscribe(community.id);
+        });
+
+        subscribeBtnContainer.appendChild(subscribeBtn);
+        subscribeBtnContainer.appendChild(unsubscribeBtn);
+
+        await showButton(await getRoleInCommunity(community.id), subscribeBtn, unsubscribeBtn);
+        
         communityBody.appendChild(subscribeBtnContainer);
         communityElement.appendChild(communityBody);
         communitiesContainer.appendChild(communityElement);
     });
 }
 
-function createSubscribeButton(communityId, isSubscribed) {
-    const subscribeBtn = document.createElement("button");
-    subscribeBtn.type = "button";
-    subscribeBtn.className = isSubscribed ? "btn btn-danger" : "btn btn-primary";
-    subscribeBtn.textContent = isSubscribed ? "Отписаться" : "Подписаться";
-    
-    subscribeBtn.addEventListener("click", async () => {
-        const success = await handleSubscribe(communityId, !isSubscribed);
-
-        if (success) {
-            updateCommunitiesUI(communities);
-        }
-    });
-
-    return subscribeBtn;
+async function showButton(role, subscribeBtn, unsubscribeBtn){
+    console.log(role);
+    if (role == "Administrator"){
+        console.log("OK");
+        return;
+    }
+    if (role == "Subscriber"){
+        unsubscribeBtn.className = "btn btn-danger ms-5";
+        return;
+    }
+    if (role == null){
+        subscribeBtn.className = "btn btn-primary ms-5";
+        return;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async function (e) {
