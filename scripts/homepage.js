@@ -214,36 +214,48 @@ function updatePostsUI(posts) {
         titleText.className = "col-md-12 text-start";
         titleText.innerHTML = `<h5 class="text-dark h-75">${post.title}</h5>`;
         titleElement.appendChild(titleText);
-    
+
+
         
         const descriptionElement = document.createElement("div");
         descriptionElement.className = "row mb-2";
 
-        const descriptionText = document.createElement("div");
-        descriptionText.className = "row mt-2 col-md-auto text-start";
+        if (post.image != null)
+        {
+            const imageElement = document.createElement("img");
+            imageElement.className = "col-md-auto";
+            imageElement.src = post.image;
+            imageElement.alt = "post image";
+            imageElement.style.maxWidth = "100%";
+            imageElement.style.height = "auto";
+            descriptionElement.appendChild(imageElement);
+        }
 
+        const descriptionText = document.createElement("div");
+        descriptionText.className = "row mt-2 col-md-auto text-start text-break"; // Добавлен класс text-wrap
         const truncatedDescription = post.description.length > 200
             ? post.description.slice(0, 200) + "..."
             : post.description;
-
-        descriptionText.innerHTML = `<div class="text-dark">${truncatedDescription}</div>`;
-
+        
+        descriptionText.innerHTML = `<div class="text-dark text-break">${truncatedDescription}</div>`;
+        
         const readMoreElement = document.createElement("div");
         readMoreElement.className = "row mt-auto justify-content-start";
-
+        
         if (post.description.length > 200) {
             const showMoreButton = document.createElement("button");
             showMoreButton.className = "btn btn-link text-start";
             showMoreButton.textContent = "Показать полностью";
             showMoreButton.addEventListener("click", () => {
-                descriptionText.innerHTML = `<div class="text-dark">${post.description}</div>`;
+                descriptionText.innerHTML = `<div class="text-dark text-break">${post.description}</div>`;
                 readMoreElement.style.display = "none";
             });
             readMoreElement.appendChild(showMoreButton);
         }
-
+        
         descriptionText.appendChild(readMoreElement);
         descriptionElement.appendChild(descriptionText);
+        
 
     
         const tagsElement = document.createElement("div");
