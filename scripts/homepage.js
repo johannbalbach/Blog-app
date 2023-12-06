@@ -149,8 +149,8 @@ async function GetTags() {
     }
 }
 
-async function handleLike(postId, IsitAdd) {
-    const apiUrl = `https://blog.kreosoft.space/api/${postId}/like`;
+async function handleLike(postId, IsitAdd, likeElement) {
+    const apiUrl = `https://blog.kreosoft.space/api/post/${postId}/like`;
     const method = IsitAdd ? 'POST': 'DELETE';
     const token = localStorage.getItem('token');
 
@@ -162,24 +162,35 @@ async function handleLike(postId, IsitAdd) {
                 "Content-Type": "application/json",
             },
         });
-        //Добавить визуально, что вы должны быть авторизованы, если хотите поставить лайк
-        if (response.status = '401')
-        {
+        if (response.ok){
+            return true
+        }
+        if (response.status = '401'){
+            likeElement.style.color = 'red';
+            likeElement.style.animation = 'shake 0.5s';
 
+            let likeCount = parseInt(likeElement.innerHTML);
+            likeElement.innerHTML = `${parseInt(likeElement.innerHTML)+1}`
+            
+            await setTimeout(() => {
+                likeElement.classList.remove("animate__headShake");
+
+                likeElement.style.color = '';
+                likeElement.style.animation = '';
+                likeElement.innerHTML = `${likeCount}`;
+            }, 500);
+            return false;
         }
         else if (!response.ok) {
             console.error("Ошибка обработки лайка:", response.status, response.statusText);
+            return false;
         }
     } catch (error) {
         console.error("Error:", error);
     }
 }
 
-function showFullPost(postId) {
-
-}
-
-function goToPost(postId) {
+async function goToPost(postId) {
 
 }
 
@@ -215,7 +226,8 @@ function updatePostsUI(posts) {
         titleText.innerHTML = `<h5 class="text-dark h-75">${post.title}</h5>`;
         titleElement.appendChild(titleText);
 
-
+        headerElement.appendChild(authorElement);
+        headerElement.appendChild(titleElement);
         
         const descriptionElement = document.createElement("div");
         descriptionElement.className = "row mb-2";
@@ -274,18 +286,56 @@ function updatePostsUI(posts) {
     
         const statsElement = document.createElement("div");
         statsElement.className = "row bg-light border-top border-2 mt-2";
-        statsElement.innerHTML = `
-            <div class="col-md-auto mt-1 mb-1">
-                <i class="fa-regular fa-comment"> ${post.commentsCount}</i>
-            </div>
-            <div class="col-md-auto mt-1 mb-1">
-                <i class="fa-regular fa-heart"> ${post.likes}</i>
-            </div>
-        `;
-    
+
+        const commentContainer = document.createElement("div");
+        commentContainer.className = "col-6 mt-1 mb-1 d-flex justify-content-start";
+        const commentElement = document.createElement("i");
+        commentElement.className = "fa-regular fa-comment";
+        commentElement.innerHTML = `  ${post.commentsCount}`;
+
+        commentElement.addEventListener('click', async (event) =>{
+            await goToPost();
+        });
+        commentContainer.appendChild(commentElement);
+
+        const likeContainer = document.createElement("div");
+        likeContainer.className = "col-6 mt-1 mb-1 d-flex justify-content-end";
+        const likeElement = document.createElement("i");
+        likeElement.className = "fa-regular fa-heart d-none";
+        likeElement.innerHTML =  `  ${post.likes}`;
+
+        const likeElementSolid = document.createElement("i");
+        likeElementSolid.className = "fa-solid fa-heart d-none";
+        likeElementSolid.style.color = 'red';
+        likeElementSolid.innerHTML =  `  ${post.likes + 1}`;
+
+        likeElement.addEventListener('click', async (event) =>{
+            if (await handleLike(post.id, true, likeElement)){
+                likeElementSolid.classList.remove("d-none");
+                likeElement.classList.add("d-none");
+            }
+        });
+
+        likeElementSolid.addEventListener('click', async (event) =>{
+            if (await handleLike(post.id, false, likeElementSolid)){
+                likeElement.classList.remove("d-none");
+                likeElementSolid.classList.add("d-none");
+            }
+        });
+
+        if (post.hasLike){
+            likeElementSolid.classList.remove("d-none");
+        }
+        else{
+            likeElement.classList.remove("d-none");
+        }
+        likeContainer.appendChild(likeElement);
+        likeContainer.appendChild(likeElementSolid);
+
+        statsElement.appendChild(commentContainer);
+        statsElement.appendChild(likeContainer);
+        
         postElement.appendChild(headerElement);
-        headerElement.appendChild(authorElement);
-        headerElement.appendChild(titleElement);
         postElement.appendChild(descriptionElement);
         postElement.appendChild(tagsElement);
         postElement.appendChild(readingTimeElement);
