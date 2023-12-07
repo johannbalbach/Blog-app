@@ -16,10 +16,10 @@ async function GetUserName()
         if (response.ok) {
             const data = await response.json();
 
-            document.querySelector('#navbarDropdown').textContent = data.email || '';
-        } else {
-            window.location.href = 'http://127.0.0.1:5500/view/login.html';
-            console.error('Ошибка получения данных профиля:', response.status, response.statusText);
+            updateUI(data.email);
+        } 
+        else {
+            
         }
     } catch (error) {
         console.error('Ошибка при выполнении GET-запроса:', error);
@@ -40,7 +40,7 @@ async function sendRequestLogout()
 
         if (response.ok) {
             localStorage.removeItem('token');
-            window.location.href = 'http://localhost/login';
+            window.location.href = '/login';
         } else {
             console.error('Ошибка получения данных профиля:', response.status, response.statusText);
         }
@@ -49,10 +49,21 @@ async function sendRequestLogout()
     }
 }
 
+async function updateUI(email){
+    document.querySelector('#navbarDropdown').textContent = email || '';
+
+    document.getElementById('profileLink').classList.remove("d-none");
+    document.getElementById('homepageLink').classList.remove("d-none");
+    document.getElementById('writepostLink').classList.remove("d-none");
+    document.getElementById('communitiesLink').classList.remove("d-none");
+    document.getElementById('authorLink').classList.remove("d-none");
+    document.getElementById('loginBtn').classList.add("d-none");
+}
+
 document.getElementById('logoutBtn').addEventListener('click', async function() {
     await sendRequestLogout();
 });
 
 document.addEventListener('DOMContentLoaded', async function(event) {
-    GetUserName();
+    await GetUserName();
 });

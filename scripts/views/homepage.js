@@ -16,11 +16,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     setFilters(getFiltersFromURL());
 
     pageSizer.value = pageSize;
-
-    if (true)//сделать проверку на валидность токена => если токен валиден, сделать кнопку написать пост видимым
-    {
-        document.getElementById('PostBtn').className = 'btn btn-primary';
-    }
     
     await fetchPosts(getFilters(page, pageSize))
 
@@ -36,6 +31,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         updatePagination(parseInt(page) - 1);
         updateActivePage(page);
     }
+
+    updateWritePostBtn();
 });
 
 submitFilter.addEventListener('submit', async function(event) {
@@ -188,10 +185,6 @@ async function handleLike(postId, IsitAdd, likeElement) {
     } catch (error) {
         console.error("Error:", error);
     }
-}
-
-async function goToPost(postId) {
-
 }
 
 function updatePostsUI(posts) {
@@ -355,6 +348,15 @@ function UpdateTags(tags){
         optionElement.textContent = tag.name;
         tagMenu.appendChild(optionElement);
     });
+}
+
+function updateWritePostBtn(){
+    email = document.querySelector('#navbarDropdown').textContent || '';
+
+    console.log(email);
+    if (email != ''){
+        document.getElementById('PostBtn').classList.remove("d-none");
+    }
 }
 
 

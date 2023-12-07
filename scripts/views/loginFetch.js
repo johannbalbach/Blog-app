@@ -3,8 +3,9 @@ const loginForm = document.getElementById('loginForm');
 const loginBtn = document.getElementById('loginBtnMain');
 
 async function enterBlog(Token) {
-  // сохраняем BearerToken в localStorage для использования в будущем
   localStorage.setItem('token', Token);
+
+  window.location.href = '/homepage';
 }
 
 async function sendRequest(method, url, body = null) {
@@ -55,4 +56,3 @@ loginForm.addEventListener('submit', async function(event) {
 
   this.classList.add('was-validated');
 });
-
