@@ -18,6 +18,7 @@ async function GetUserName()
 
             document.querySelector('#navbarDropdown').textContent = data.email || '';
         } else {
+            window.location.href = 'http://127.0.0.1:5500/view/login.html';
             console.error('Ошибка получения данных профиля:', response.status, response.statusText);
         }
     } catch (error) {
@@ -48,9 +49,10 @@ async function sendRequestLogout()
     }
 }
 
-GetUserName();
-
 document.getElementById('logoutBtn').addEventListener('click', async function() {
     await sendRequestLogout();
 });
 
+document.addEventListener('DOMContentLoaded', async function(event) {
+    GetUserName();
+});
