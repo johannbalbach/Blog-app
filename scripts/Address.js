@@ -1,6 +1,6 @@
 export async function getAddress(id){
-    const info = getAddressChain(id);
-
+    const info = await getAddressChain(id);
+    
     const result = info.map(getObjectText).join(', ');
 
     return result;
@@ -30,21 +30,12 @@ async function getAddressChain(id) {
 }
 
 function getObjectText(object) {
-    // const strings = object.split(' ');
+    const strings = object.text.    split(' ');
 
-    // if (object.Level != "Building"){
-    //     return strings[0]+strings.map.join()
-    // }
-    switch (object.objectLevel) {
-      case "Region":
-        return `Томская область, ${object.text}`;
-      case "City":
-        return `г. Томск, ${object.text}`;
-      case "ElementOfRoadNetwork":
-        return `пер. Мостовой, ${object.text}`;
-      case "Building":
-        return `д. ${object.text}`;
-      default:
-        return object.text;
+    if (object.Level != "Building"){
+        let temp = strings[0] + '. ';
+        strings.shift();
+        temp = temp + strings.join(' ');
+        return temp;
     }
   }

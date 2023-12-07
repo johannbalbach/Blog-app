@@ -2,9 +2,7 @@ import {updatePostUI} from "../postCreate.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
     const postID = await getUrlParams();
-    console.log(postID);
     const postinfo = await getPost(postID);
-    console.log(postinfo);
 
     await updatePostUI(postinfo, document.getElementById('postsContainer'), true);
 });
@@ -37,7 +35,6 @@ async function getPost(id) {
 async function getUrlParams() {
     const url = new URL(window.location);
     const postID = url.pathname.split('/')[2];
-    console.log(postID);
     
     return postID;
 }

@@ -1,19 +1,16 @@
-import { getAddress } from "./Address";
+import { getAddress } from "./Address.js";
 
 export function updatePostsUI(posts) {
-    console.log("K");
     const postsContainer = document.getElementById("postsContainer");
 
     postsContainer.innerHTML = '';
 
-    console.log(posts);
-
-    posts.forEach(post => {
-        updatePostUI(post, postsContainer, false);
+    posts.forEach(async post => {
+        await updatePostUI(post, postsContainer, false);
     });
 }
 
-export function updatePostUI(post, postsContainer, IsthereAddress){
+export async function updatePostUI(post, postsContainer, IsthereAddress){
     const postElement = document.createElement("div");
     postElement.className = "container-md col-auto border border-2 mb-4 rounded-2";
     const headerElement = document.createElement("div");
@@ -100,13 +97,16 @@ export function updatePostUI(post, postsContainer, IsthereAddress){
 
     if(IsthereAddress){
         if (post.addressId != null){
-            const address =  getAddress(post.id);
+            const address = await getAddress(post.addressId);
 
             const addressElement = document.createElement("div");
             addressElement.className = "row mb-1";
             const addressTextElement = document.createElement("div");
             addressTextElement.className = "col-md-auto";
-            readingTimeText.innerHTML = `<div class="col-md-12 text-start"><i class="fa-solid fa-location-dot"><div class="text-dark">${address}</div></i></div>`;
+            readingTimeText.innerHTML = `<div class="col-md-12 text-start d-flex">
+            <i class="fa-solid fa-location-dot"></i>
+            <div class="text-dark ms-1">${address}</div>
+            </div>`;
 
             addressElement.appendChild(addressTextElement);
             postElement.appendChild(addressElement);
@@ -169,8 +169,6 @@ export function updatePostUI(post, postsContainer, IsthereAddress){
     postElement.appendChild(tagsElement);
     postElement.appendChild(readingTimeElement);
     postElement.appendChild(statsElement);
-
-    console.log(postElement);
 
     postsContainer.appendChild(postElement);
 }
