@@ -1,4 +1,4 @@
-//import {updatePostUI} from "../postCreate.js";
+import {updatePostsUI} from "../postCreate.js";
 import { GetTags } from "../Tags.js";
 import {updatePage} from "../pagination.js";
 import {updateActivePage} from "../pagination.js";
@@ -22,10 +22,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     setFilters(await getFiltersFromURL());
 
     const communityPosts = await getCommunityPosts(getFilters(communityId, page, pageSize));
-    //await updatePostUI(communityPosts, document.getElementById('postsContainer'), true);
+    await updatePostsUI(communityPosts.posts);
 
     const communityInfo = await getConcreteCommunity(communityId);
-    console.log(communityInfo);
     await updateCommunityUI(communityInfo, communityId);
 
     if (parseInt(page) % 3 === 0){
@@ -91,17 +90,8 @@ async function getConcreteCommunity(id){
     }
 }
 
-async function updateWritePostBtn(){
-    
-
-    console.log(email);
-    if (email != ''){
-        document.getElementById('PostBtn').classList.remove("d-none");
-    }
-}
-
-
 async function updateCommunityUI(info, id){
+
     console.log(info);
 
     document.getElementById('communityName').innerHTML = `Группа "${info.name}"`;
@@ -109,14 +99,65 @@ async function updateCommunityUI(info, id){
     await showButton(await getRoleInCommunity(id), subscribeBtn, unsubscribeBtn);
     
     document.getElementById('communitySubscribers').innerHTML = `${info.subscribersCount} подписчиков`;
-    document.getElementById('communityType').innerHTML = info.isClosed ? "закрытая" : "открытая";
+    document.getElementById('communityType').innerHTML = `Тип сообщества: ${info.isClosed ? "закрытая" : "открытая"}`;
+    createAdmins(info.administrators);
+}
+async function createAdmins(admins) {
+    const adminsList = document.getElementById('communityAdminsContainer');
 
-    //document.getElementById('communityAdminsContainer').classList.add("d-none");
+    admins.forEach(async (admin, index, array) => {
+        const adminRow = document.createElement("div");
+        adminRow.className = "row mb-3 ms-3";
+        if (index != array.length - 1) {
+            adminRow.classList.add("border-bottom", "border-3")
+        }
+
+        adminRow.addEventListener('click', async (e) => {
+            window.location.href = `/homepage?author=${author.fullName}&page=1&size=5`;
+        })
+
+        const avatarCol = document.createElement("div");
+        avatarCol.classList.add("col-sm-2", "col-xxl-1", "col-xl-1", "justify-content-center");
+
+        const avatarImg = document.createElement("img");
+        if (admin.gender == "Male"){
+            avatarImg.src = "http://127.0.0.1:5500/views/images/manicon.jpg";
+            avatarImg.alt = "Male Avatar";
+        }
+        else{
+            avatarImg.src = "http://127.0.0.1:5500/views/images/member-dafault-w.jpeg";
+            avatarImg.alt = "Female Avatar";
+        }
+       
+        avatarImg.classList.add("img", "rounded-circle", "border", "border-2", "flex-d", "h-auto", "mb-2", "mt-2");
+        avatarImg.width = 75;
+        avatarImg.height = 75;
+        
+        avatarCol.appendChild(avatarImg);
+
+        const detailsCol = document.createElement("div");
+        detailsCol.classList.add("col-sm-10", "col-xxl-11", "col-xl-11");
+
+        const nameCol = document.createElement("div");
+        nameCol.classList.add("col-8", "d-flex", "align-items-center", "ms-3");
+
+        const nameElement = document.createElement("div");  
+        nameElement.classList.add("fw-bold", "fs-5", "text-dark");
+        nameElement.textContent = admin.fullName;
+
+        nameCol.appendChild(nameElement);
+
+        detailsCol.appendChild(nameCol);
+
+        adminRow.appendChild(avatarCol);
+        adminRow.appendChild(detailsCol);
+        
+        adminsList.appendChild(adminRow);
+    });
 }
 
 async function showButton(role, subscribeBtn, unsubscribeBtn){
     if (role == "Administrator"){
-        console.log("OK");
         return;
     }
     if (role == "Subscriber"){
@@ -182,7 +223,6 @@ function generateApiUrl(filters) {
       queryParams.push(`sorting=${filters.sorting}`);
     }   
     const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
-    console.log(apiUrl);
     return apiUrl;
   }
 

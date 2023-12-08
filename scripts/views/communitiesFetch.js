@@ -100,6 +100,10 @@ async function updateCommunitiesUI(communities) {
         const communityElement = document.createElement("div");
         communityElement.className = "container-md col-auto rounded-3 bg-light border border-2 mb-4";
 
+        communityElement.addEventListener('click', async (e) =>{
+            window.location.href = `/communities/${community.id}`;
+        })
+
         const communityBody = document.createElement("div");
         communityBody.className = "row mt-2";
         communityBody.innerHTML = `

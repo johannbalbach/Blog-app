@@ -36,7 +36,7 @@ app.get('/post/:id', (req, res) => {
     res.status(200).send(modifiedContent);
 });
 
-app.get('/community/:id', (req, res) => {   
+app.get('/communities/:id', (req, res) => {   
   const indexContent = fs.readFileSync( path.join(_dirname, '../index.html'), 'utf-8');
   const communityContent = fs.readFileSync(path.join(_dirname, `../views/community.html`), 'utf-8');
 

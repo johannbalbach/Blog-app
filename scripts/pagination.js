@@ -5,6 +5,7 @@ const secondPage = document.getElementById('secondPage');
 const thirdPage = document.getElementById('thirdPage');
 
 async function updateUrlParams(page, pageSize, filters) {
+    console.log(filters);
     const url = new URL(window.location);
     url.searchParams.set('page', page);
     url.searchParams.set('pageSize', pageSize);
@@ -20,9 +21,15 @@ async function updateUrlParams(page, pageSize, filters) {
             url.searchParams.append('tags', tag);
         });
     }
-    url.searchParams.set('author', filters.authorName)
-    url.searchParams.set('readingTimeFrom', filters.readingTimeFrom)
-    url.searchParams.set('readingTimeTo', filters.readingTimeTo)
+    if (filters.authorName != undefined){
+        url.searchParams.set('author', filters.authorName)
+    }
+    if (filters.authorName != undefined){
+        url.searchParams.set('readingTimeFrom', filters.readingTimeFrom)
+    }
+    if (filters.authorName != undefined){
+        url.searchParams.set('readingTimeTo', filters.readingTimeTo)
+    }
     url.searchParams.set('sorting', filters.sorting)
     if (filters.onlyMyCommunities) {
         url.searchParams.set('OnlyMyCommunities', filters.onlyMyCommunities)
