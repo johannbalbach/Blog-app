@@ -103,8 +103,8 @@ async function updateCommunitiesUI(communities) {
         const communityBody = document.createElement("div");
         communityBody.className = "row mt-2";
         communityBody.innerHTML = `
-            <div class="container-md col-6 mt-3 mb-3">
-                <h4 class="text-dart">${community.name}</h4>
+            <div class="container-md col-8 mt-3 mb-3 justify-content-start">
+                <h4 class="text-dark ms-3">${community.name}</h4>
             </div>
         `;
 
@@ -147,7 +147,6 @@ async function updateCommunitiesUI(communities) {
 }
 
 async function showButton(role, subscribeBtn, unsubscribeBtn){
-    console.log(role);
     if (role == "Administrator"){
         console.log("OK");
         return;
