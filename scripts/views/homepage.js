@@ -13,7 +13,6 @@ const pageSizer = document.getElementById('pageSize');
 let maxPages = 1;
 
 document.addEventListener("DOMContentLoaded", async function () {
-    
     const { page, pageSize } = await getUrlParams();
     await GetTags();
 
