@@ -25,6 +25,18 @@ app.get('/:page', (req, res) => {
     res.status(200).send(modifiedContent);
 });
 
+app.get('/community/:id', (req, res) => {   
+  const indexContent = fs.readFileSync( path.join(_dirname, '../index.html'), 'utf-8');
+  const communityContent = fs.readFileSync(path.join(_dirname, `../views/community.html`), 'utf-8');
+
+  // Вставляем содержимое страницы внутрь <main>
+  const modifiedContent = indexContent.replace('<main></main>', `<main>${communityContent}</main>`);
+
+  // Отправляем результат
+  res.status(200).send(modifiedContent);
+});
+
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(_dirname, '../index.html'));
 });
