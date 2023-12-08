@@ -39,6 +39,11 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
 
     headerElement.appendChild(authorElement);
     headerElement.appendChild(titleElement);
+    if (!IsthereAddress){
+        headerElement.addEventListener('click', async (event) =>{
+            await goToPost(post.id);
+        });
+    }
     
     const descriptionElement = document.createElement("div");
     descriptionElement.className = "row mb-2";
@@ -122,9 +127,11 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
     commentElement.className = "fa-regular fa-comment";
     commentElement.innerHTML = `  ${post.commentsCount}`;
 
-    commentElement.addEventListener('click', async (event) =>{
-        await goToPost();
-    });
+    if (!IsthereAddress){
+        commentElement.addEventListener('click', async (event) =>{
+            await goToPost(post.id);
+        });
+    }
     commentContainer.appendChild(commentElement);
 
     const likeContainer = document.createElement("div");
@@ -136,12 +143,20 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
     const likeElementSolid = document.createElement("i");
     likeElementSolid.className = "fa-solid fa-heart d-none";
     likeElementSolid.style.color = 'red';
-    likeElementSolid.innerHTML =  `  ${post.likes + 1}`;
+    likeElementSolid.innerHTML =  `  ${post.likes}`;
 
     likeElement.addEventListener('click', async (event) =>{
         if (await handleLike(post.id, true, likeElement)){
             likeElementSolid.classList.remove("d-none");
             likeElement.classList.add("d-none");
+            if (post.hasLike){
+                likeElementSolid.innerHTML = `${post.likes}`
+            }
+            else{
+                likeElementSolid.innerHTML = `${post.likes + 1}`
+            }
+           
+            
         }
     });
 
@@ -149,6 +164,12 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
         if (await handleLike(post.id, false, likeElementSolid)){
             likeElement.classList.remove("d-none");
             likeElementSolid.classList.add("d-none");
+            if (post.hasLike){
+                likeElement.innerHTML = `${post.likes - 1}` 
+            }
+            else{
+                likeElement.innerHTML = `${post.likes}` 
+            }
         }
     });
 
@@ -171,4 +192,49 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
     postElement.appendChild(statsElement);
 
     postsContainer.appendChild(postElement);
+}
+
+async function goToPost(id){
+    window.location.href = `/post/${id}`;
+}
+
+async function handleLike(postId, IsitAdd, likeElement) {
+    const apiUrl = `https://blog.kreosoft.space/api/post/${postId}/like`;
+    const method = IsitAdd ? 'POST': 'DELETE';
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (response.ok){
+            return true
+        }
+        if (response.status = '401'){
+            // likeElement.style.color = 'red';
+            // likeElement.style.animation = 'shake 0.5s';
+
+            // let likeCount = parseInt(likeElement.innerHTML);
+            // likeElement.innerHTML = `${parseInt(likeElement.innerHTML)+1}`
+            
+            // await setTimeout(() => {
+            //     likeElement.classList.remove("animate__headShake");
+
+            //     likeElement.style.color = '';
+            //     likeElement.style.animation = '';
+            //     likeElement.innerHTML = `${likeCount}`;
+            // }, 500);
+            // return false;
+        }
+        else if (!response.ok) {
+            console.error("Ошибка обработки лайка:", response.status, response.statusText);
+            return false;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }

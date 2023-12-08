@@ -148,49 +148,6 @@ async function GetTags() {
     }
 }
 
-async function handleLike(postId, IsitAdd, likeElement) {
-    const apiUrl = `https://blog.kreosoft.space/api/post/${postId}/like`;
-    const method = IsitAdd ? 'POST': 'DELETE';
-    const token = localStorage.getItem('token');
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: method,
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
-        if (response.ok){
-            return true
-        }
-        if (response.status = '401'){
-            likeElement.style.color = 'red';
-            likeElement.style.animation = 'shake 0.5s';
-
-            let likeCount = parseInt(likeElement.innerHTML);
-            likeElement.innerHTML = `${parseInt(likeElement.innerHTML)+1}`
-            
-            await setTimeout(() => {
-                likeElement.classList.remove("animate__headShake");
-
-                likeElement.style.color = '';
-                likeElement.style.animation = '';
-                likeElement.innerHTML = `${likeCount}`;
-            }, 500);
-            return false;
-        }
-        else if (!response.ok) {
-            console.error("Ошибка обработки лайка:", response.status, response.statusText);
-            return false;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-    }
-}
-
-
-
 function UpdateTags(tags){
     const tagMenu = document.getElementById('tags');
     tagMenu.innerHTML = '';
