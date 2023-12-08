@@ -25,6 +25,17 @@ app.get('/:page', (req, res) => {
     res.status(200).send(modifiedContent);
 });
 
+app.get('/post/:id', (req, res) => {   
+    const indexContent = fs.readFileSync( path.join(_dirname, '../index.html'), 'utf-8');
+    const postContent = fs.readFileSync(path.join(_dirname, `../views/post.html`), 'utf-8');
+  
+    // Вставляем содержимое страницы внутрь <main>
+    const modifiedContent = indexContent.replace('<main></main>', `<main>${postContent}</main>`);
+  
+    // Отправляем результат
+    res.status(200).send(modifiedContent);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(_dirname, '../index.html'));
 });
