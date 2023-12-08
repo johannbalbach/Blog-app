@@ -1,9 +1,15 @@
 //import {updatePostUI} from "../postCreate.js";
 import { GetTags } from "../Tags.js";
+import {updatePage} from "../pagination.js";
+import {updateActivePage} from "../pagination.js";
+import {updatePagination} from "../pagination.js";
+import {getFiltersFromURL} from "../pagination.js";
+import { getUrlParams } from "../pagination.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
     GetTags();
     const {communityId,  page, pageSize} = await getUrlParams();
+    console.log(communityId);
     const communityPosts = await getCommunityPost(getFilters(communityId, page, pageSize));
     //await updatePostUI(communityPosts, document.getElementById('postsContainer'), true);
 });
@@ -63,12 +69,3 @@ function generateApiUrl(filters) {
     console.log(apiUrl);
     return apiUrl;
   }
-
-async function getUrlParams() {
-    const url = new URL(window.location);
-    const communityId = url.pathname.split('/')[2];
-    const page = url.searchParams.get('page') || 1;
-    const pageSize = url.searchParams.get('pageSize') || 5;
-    
-    return {communityId, page, pageSize};
-}

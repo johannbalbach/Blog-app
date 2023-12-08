@@ -1,4 +1,8 @@
-const pagination = document.getElementById('pagination');
+const leftPage = document.getElementById('leftPage');
+const rightPage = document.getElementById('rightPage');
+const firstPage = document.getElementById('firstPage');
+const secondPage = document.getElementById('secondPage');
+const thirdPage = document.getElementById('thirdPage');
 
 async function updateUrlParams(page, pageSize, filters) {
     const url = new URL(window.location);
@@ -32,9 +36,10 @@ async function updateUrlParams(page, pageSize, filters) {
   
 export async function getUrlParams() {
     const url = new URL(window.location);
+    const communityId = url.pathname.split('/')[2];
     const page = url.searchParams.get('page') || 1;
     const pageSize = url.searchParams.get('pageSize') || 5;
-    return { page, pageSize };
+    return { page, pageSize, communityId };
 }
 
 export async function getFiltersFromURL(){
@@ -114,4 +119,4 @@ export async function updatePage(currentPage, currentSize, filters, maxPages){
     await updatePagination(currentPage);
     await updateActivePage(currentPage, maxPages);
 }
-  
+
