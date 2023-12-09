@@ -11,7 +11,7 @@ async function updateUI(){
     document.getElementById('postsContainer').innerHTML = '';
     await updatePostUI(postinfo, document.getElementById('postsContainer'), true);
 
-    await updateCommentsUI(postinfo.comments);
+    await updateCommentsUI(postinfo.comments, document.getElementById('commentContainer'), false);
 }
 
 document.getElementById("saveBtn").addEventListener('click', async function(event) {
@@ -82,19 +82,16 @@ async function getUrlParams() {
     return postID;
 }
 
-async function updateCommentsUI(commentsArray) {
-    console.log(commentsArray);
-    
+async function updateCommentsUI(commentsArray, commentContainer, isitChildComments) {
     commentsArray.forEach(async comment => {
-        const commentContainer = document.getElementById('commentContainer');
         commentContainer.innerHTML = '';
-        const commentElement = await createCommentElement(comment);
+        const commentElement = await createCommentElement(comment, isitChildComments);
         commentContainer.appendChild(commentElement);
     });
 }
 
 // Функция для создания элемента комментария
-async function createCommentElement(comment) {
+async function createCommentElement(comment, isitChildComments) {
     const commentElement = document.createElement('div');
     commentElement.className = "row mt-3 ms-2 me-2"
 
@@ -106,6 +103,27 @@ async function createCommentElement(comment) {
     authorContent.textContent = `${comment.author}`;
     headerElement.appendChild(authorContent);
 
+    const editForm = document.createElement('form');
+    editForm.className = "mt-3 d-flex d-none";
+
+    const editTextArea = document.createElement('textarea');
+    editTextArea.className = "form-control mb-2";
+    editTextArea.placeholder = 'Оставьте комментарий...';
+    editTextArea.rows = "1";
+
+    const submitEditBtn = document.createElement('button');
+    submitEditBtn.className = "btn btn-warning justify-self-end ms-5 mb-auto"
+    submitEditBtn.textContent = 'Отправить';  
+    submitEditBtn.addEventListener('click', (event) => {
+        const body = {
+            content: editTextArea.value
+        };
+        sendRequestPUT(body, comment.id);
+    });
+
+    editForm.appendChild(editTextArea);
+    editForm.appendChild(submitEditBtn);
+
     const actionButtons = document.createElement('div');
     actionButtons.className = 'fs-7 mt-1 mb-1';
 
@@ -113,7 +131,14 @@ async function createCommentElement(comment) {
     editButton.className = "fa-solid fa-pen ms-2";
     editButton.style = "color: gold;";
     editButton.addEventListener('click', () => {
-    // Логика для редактирования комментария
+        if (editForm.classList.contains('d-none')){
+            editForm.classList.remove('d-none');
+            commentContent.classList.add('d-none');
+        }
+        else{
+            editForm.classList.add('d-none');
+            commentContent.classList.remove('d-none');
+        }
     });
 
     const deleteButton = document.createElement('i');
@@ -132,25 +157,38 @@ async function createCommentElement(comment) {
     
 
     const commentContent = document.createElement('div');
-    commentContent.className= "text-dark text-wrap mt-1 mb-1 d-flex"
+    commentContent.className= "text-dark text-break text-wrap mt-1 mb-1 d-flex"
     commentContent.textContent = comment.content;
     
-    // Добавляем пометку об изменении, если комментарий был изменен
     if (comment.modifiedDate) {
         const modificationInfo = document.createElement('div');
         modificationInfo.className = "text-wrap fs-7 ms-2"
         modificationInfo.style = "color: grey;"
         modificationInfo.textContent = `(изменен)`;
         commentContent.appendChild(modificationInfo);
+
+        modificationInfo.dataset.bsToggle = "tooltip";
+        modificationInfo.dataset.bsPlacement = "top";
+        modificationInfo.title = await formatDateTime(comment.modifiedDate);
+
+        commentContent.appendChild(modificationInfo);
     }
     if (comment.deleteDate) {
         commentContent.textContent = "[Комментарий удалён]";
         authorContent.textContent = "[Комментарий удалён]";
+
+        commentContent.dataset.bsToggle = "tooltip";
+        commentContent.dataset.bsPlacement = "top";
+        commentContent.title = await formatDateTime(comment.deleteDate);
+        authorContent.dataset.bsToggle = "tooltip";
+        authorContent.dataset.bsPlacement = "top";
+        authorContent.title = await formatDateTime(comment.deleteDate);
     } 
 
     
 
     commentElement.appendChild(headerElement);
+    commentElement.appendChild(editForm);
     commentElement.appendChild(commentContent);
 
     const flexcolumn = document.createElement('div');
@@ -175,9 +213,17 @@ async function createCommentElement(comment) {
     const submitReplayBtn = document.createElement('button');
     submitReplayBtn.className = "btn btn-primary justify-self-end ms-5 mb-auto"
     submitReplayBtn.textContent = 'Отправить';  
-    submitReplayBtn.addEventListener('click', (event) => {
+    submitReplayBtn.addEventListener('click', async (event) => {
         event.preventDefault();
-        // Логика для отправки ответ
+        const postID = await getUrlParams();
+        const text = replyTextArea.value;
+    
+        const body = {
+            content: text,
+            parentId: comment.id
+        }
+    
+        await commentPost(postID, body);
     });
 
     replyForm.appendChild(replyTextArea);
@@ -193,19 +239,33 @@ async function createCommentElement(comment) {
         else{
             replyForm.classList.add('d-none');
         }
-        
     });
     undertextElement.appendChild(replyBtn);
     flexcolumn.appendChild(undertextElement);
     commentElement.appendChild(flexcolumn);
     commentElement.appendChild(replyForm);
 
-    if (comment.subComments > 0) {
+    if (comment.subComments > 0 && !isitChildComments) {
         const showRepliesButton = document.createElement('button');
         showRepliesButton.className = 'btn btn-link mb-1 fs-7 text-start';
         showRepliesButton.textContent = 'Раскрыть ответы';
-        showRepliesButton.addEventListener('click', () => {
-            // Логика для отображения вложенных комментариев
+
+        const childComments = await getCommentTree(comment.id);
+        const childCommentsContainer = document.createElement('div');
+        childCommentsContainer.className = "border-start border-info border-3 rounded-1 ms-2 d-none";
+
+        commentElement.appendChild(childCommentsContainer);
+        await updateCommentsUI(childComments, childCommentsContainer, true);
+
+        showRepliesButton.addEventListener('click', async () => {
+            if (childCommentsContainer.classList.contains('d-none')){
+                childCommentsContainer.classList.remove('d-none');
+                showRepliesButton.textContent = 'Скрыть ответы';
+            }
+            else{
+                childCommentsContainer.classList.add('d-none');
+                showRepliesButton.textContent = 'Раскрыть ответы';
+            }
         });
 
         commentElement.appendChild(showRepliesButton);
@@ -226,7 +286,7 @@ async function GetUserId()
 {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(ProfileURL, {
+        const response = await fetch("https://blog.kreosoft.space/api/account/profile", {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -279,6 +339,27 @@ async function sendRequestPUT(body, id) {
 
         if (response.ok) {
             await updateUI();
+        } else {
+
+        }
+    } catch (error) {
+        console.error('Ошибка сети:', error);
+    }
+}
+async function getCommentTree(id) {
+    try {
+        const response = await fetch(`https://blog.kreosoft.space/api/comment/${id}/tree`, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+        });
+
+        if (response.ok) {
+            const result = await response.json()
+
+            return result;
         } else {
 
         }
