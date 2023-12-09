@@ -5,16 +5,14 @@ const secondPage = document.getElementById('secondPage');
 const thirdPage = document.getElementById('thirdPage');
 
 async function updateUrlParams(page, pageSize, filters) {
-    console.log(filters);
     const url = new URL(window.location);
     url.searchParams.set('page', page);
     url.searchParams.set('pageSize', pageSize);
 
     if (filters.tags) {
-        const existingTags = url.searchParams.getAll('tags');
-        const uniqueTagsSet = new Set([...existingTags, ...filters.tags]);//распыление
+        const uniqueTagsSet = new Set([...filters.tags]);//распыление
         const uniqueTagsArray = Array.from(uniqueTagsSet);
-
+        
         url.searchParams.delete('tags');
         
         uniqueTagsArray.forEach(tag => {
@@ -34,7 +32,7 @@ async function updateUrlParams(page, pageSize, filters) {
     if (filters.onlyMyCommunities) {
         url.searchParams.set('OnlyMyCommunities', filters.onlyMyCommunities)
     }
-    else{
+    else if (filters.onlyMyCommunities == false){
         url.searchParams.set('OnlyMyCommunities', false)
     }
     

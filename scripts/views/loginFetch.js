@@ -20,7 +20,6 @@ async function sendRequest(method, url, body = null) {
 
     if (response.ok) {
       const responseData = await response.json();
-      console.log(responseData)
       const token = responseData.token;
       await enterBlog(token);
     } else {

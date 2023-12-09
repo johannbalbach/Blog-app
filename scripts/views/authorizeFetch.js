@@ -3,9 +3,17 @@ const registerForm = document.getElementById('registerForm');
 const registerBtn = document.getElementById('registerBtn');
 
 
+
+document.addEventListener("DOMContentLoaded", function (e) {
+  const birthDate = document.querySelector('#dob');
+  const currentDate = new Date().toISOString().split('T')[0];
+
+  birthDate.max = currentDate;
+});
+
 async function enterBlog(Token) {
-    // сохраняем BearerToken в localStorage для использования в будущем
     localStorage.setItem('token', Token);
+    window.location.href = '/homepage';
 }
 
 async function sendRequest(body = null) {
@@ -20,7 +28,6 @@ async function sendRequest(body = null) {
     });
     if (response.ok) {
         const responseData = await response.json();
-        console.log(responseData)
         const token = responseData.token;
         await enterBlog(token);
     } else {

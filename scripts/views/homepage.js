@@ -39,12 +39,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 submitFilter.addEventListener('submit', async function(event) {
-    const { page, pageSize } = await getUrlParams();
-
     event.preventDefault();
     event.stopPropagation();
+    if (!this.checkValidity()) {
+        event.stopPropagation();
+    } else { 
+    const { page, pageSize } = await getUrlParams();
 
     await updatePosts(page, pageSize);
+    }
+
+    this.classList.add('was-validated');
 })
 
 export async function updatePosts(currentPage, pageSize){

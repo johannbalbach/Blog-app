@@ -1,4 +1,3 @@
-import { updatePosts } from "./views/homepage.js";
 import { getUrlParams } from "./pagination.js";
 
 const pageSizer = document.getElementById('pageSize');

@@ -34,7 +34,7 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
     titleElement.className = "row mb-2";
     const titleText = document.createElement("div");
     titleText.className = "col-md-12 text-start";
-    titleText.innerHTML = `<h5 class="text-dark h-75">${post.title}</h5>`;
+    titleText.innerHTML = `<div class="text-dark h-75 fs-4">${post.title}</div>`;
     titleElement.appendChild(titleText);
 
     headerElement.appendChild(authorElement);

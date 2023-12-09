@@ -80,8 +80,6 @@ async function createPost(body, id) {
     }
     const token = localStorage.getItem('token');
 
-    console.log(URL);
-
     try {
         const response = await fetch(URL, {
             method: 'POST',

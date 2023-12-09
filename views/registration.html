@@ -1,7 +1,7 @@
 <div class="container-md  d-flex justify-content-center align-items-center" style="height: 100vh;">
     <div class="container-md col-md-9 col-lg-7 col-xl-6 col-xxl-5 shadow p-3 mb-6">
         <div class="col-12">
-            <h2 class="mb-6"> Регистрация </h2>
+            <div class="mb-6 fs-2"> Регистрация </div>
             <form id="registerForm" class="needs-validation" novalidate>
                 <div class="form-group mb-3">
                     <label for="fullName">ФИО:</label>
@@ -12,7 +12,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="dob">Дата рождения:</label>
-                    <input type="date" class="form-control" id="dob" name="dob" pattern="^(19\d\d|20\d\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" required>
+                    <input type="date" class="form-control" id="dob" name="dob" pattern="^(19\d\d|20\d\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" max="2023-12-10" required>
                     <div class="invalid-feedback">
                         <div class="col-12 mb-2">Пожалуйста, введите корректную дату рождения.</div>
                     </div>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="phoneNumber">Номер телефона:</label>
-                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="+7 (xxx) xxx-xx-xx"
+                    <input class="form-control" id="phoneNumber" name="phoneNumber" placeholder="+7 (xxx) xxx-xx-xx"
                     pattern="^\+\d+(?:\s*(?:\d{1,4}|\(\d{1,4}\))){1,5}(?:\s*-\s*\d{2})?$"
                     required>
                     <div class="invalid-feedback">

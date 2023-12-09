@@ -16,7 +16,7 @@ async function sendRequestPUT(body = null) {
     });
 
     if (response.ok) {
-      console.log("OK");
+
     } else {
         // неправильный email или пароль
         SaveBtn.classList.add('error-animation');
@@ -92,4 +92,8 @@ document.addEventListener('DOMContentLoaded', async function(event) {
     if (!sendRequestGET(token)) {
         window.location.href = 'http://localhost/login';
     }
+    const birthDate = document.querySelector('#dob');
+    const currentDate = new Date().toISOString().split('T')[0];
+  
+    birthDate.max = currentDate;
 });

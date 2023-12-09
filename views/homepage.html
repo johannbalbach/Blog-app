@@ -8,11 +8,11 @@
         <div class="row bg-light mb-3 border-bottom border-2">
             <div class="text-dark mt-1 mb-1">Фильтры</div>
         </div>
-        <form id="filterForm" novalidate>
+        <form id="filterForm" novalidate class="needs-validation">
             <div class="row mb-2">
                 <div class="col-md-6 ">
                     <label for="authorName" class="form-label">Поиск по имени автора</label>
-                    <input type="email" class="form-control" id="authorName" placeholder="имя_автора">
+                    <input class="form-control" id="authorName" placeholder="имя_автора">
                 </div>
                 <div class="col-md-6">
                     <label for="tags" class="form-label">Поиск по тэгам</label>
@@ -33,11 +33,13 @@
                 </div>
                 <div class="col-md-3 col-lg-2 mb-2 mt-auto">
                     <label for="readingTimeFrom" class="form-label">Время чтения от</label>
-                    <input type="email" class="form-control" id="readingTimeFrom">
+                    <input  class="form-control" id="readingTimeFrom" pattern="^\d*$">
+                    <div class="invalid-feedback">Пожалуйста, введите корректное время.</div>
                 </div>
                 <div class="col-md-3 col-lg-2 mb-2 mt-auto">
                     <label for="readingTimeTo" class="form-label">Время чтения до</label>
-                    <input type="email" class="form-control" id="readingTimeTo">
+                    <input class="form-control" id="readingTimeTo" pattern="^\d*$">
+                    <div class="invalid-feedback">Пожалуйста, введите корректное время.</div>
                 </div>
                 <div class="col-md-auto mt-auto mb-2 mt-auto">
                     <div class="form-check form-check-inline">

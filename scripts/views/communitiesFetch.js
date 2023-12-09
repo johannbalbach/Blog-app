@@ -108,7 +108,7 @@ async function updateCommunitiesUI(communities) {
         communityBody.className = "row mt-2";
         communityBody.innerHTML = `
             <div class="container-md col-8 mt-3 mb-3 justify-content-start">
-                <h4 class="text-dark ms-3">${community.name}</h4>
+                <div class="text-dark ms-3 fs-4">${community.name}</div>
             </div>
         `;
 
@@ -152,7 +152,6 @@ async function updateCommunitiesUI(communities) {
 
 async function showButton(role, subscribeBtn, unsubscribeBtn){
     if (role == "Administrator"){
-        console.log("OK");
         return;
     }
     if (role == "Subscriber"){

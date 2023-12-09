@@ -22,7 +22,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     setFilters(await getFiltersFromURL());
 
     const communityPosts = await getCommunityPosts(getFilters(communityId, page, pageSize));
-    await updatePostsUI(communityPosts.posts);
+    if (communityPosts){
+        await updatePostsUI(communityPosts.posts);
+    }
 
     const communityInfo = await getConcreteCommunity(communityId);
     await updateCommunityUI(communityInfo, communityId);
@@ -91,8 +93,6 @@ async function getConcreteCommunity(id){
 }
 
 async function updateCommunityUI(info, id){
-
-    console.log(info);
 
     document.getElementById('communityName').innerHTML = `Группа "${info.name}"`;
 
@@ -213,16 +213,25 @@ function getFilters(id, pageNumber, pageSize)
 function generateApiUrl(filters) {
     const baseUrl = `https://blog.kreosoft.space/api/community/${filters.id}/post`;
     const queryParams = [];
-  
+
     if (filters.tags) {
-      filters.tags.forEach(tag => {
-        queryParams.push(`tags=${tag}`);
-      });
+        filters.tags.forEach(tag => {
+            queryParams.push(`tags=${tag}`);
+        });
     }
     if (filters.sorting !== "" && filters.sorting != "0") {
-      queryParams.push(`sorting=${filters.sorting}`);
+        queryParams.push(`sorting=${filters.sorting}`);
     }   
+
+    if (filters.pageNumber !== "") {
+        queryParams.push(`page=${filters.pageNumber}`);
+    }
+    if (filters.pageSize !== "") {
+        queryParams.push(`size=${filters.pageSize}`);
+    }
+
     const apiUrl = `${baseUrl}?${queryParams.join("&")}`;
+
     return apiUrl;
   }
 
@@ -237,62 +246,75 @@ function setFilters(filters)
     document.getElementById('sorting').value = filters.sorting;
 }
 
-pageSizer.addEventListener('change', async function(event) {
-    const { page } = await getUrlParams();
+export async function updatePosts(id, currentPage, pageSize){
+    const filters = await getFilters(id, currentPage, pageSize);
+    await updatePage(currentPage, pageSize,  filters, maxPages);
+    const communityPosts =await getCommunityPosts(filters);
+    if (communityPosts){
+        await updatePostsUI(communityPosts.posts);
+    }
+}
 
-    await updatePosts(page, event.target.value);
+document.getElementById("filterForm").addEventListener('submit', async function(event) {
+    const { communityId, page, pageSize } = await getUrlParams();
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    await updatePosts(communityId, page, pageSize);
+})
+
+
+pageSizer.addEventListener('change', async function(event) {
+    const {communityId, page } = await getUrlParams();
+
+    await updatePosts(communityId, page, event.target.value);
 })
 
 leftPage.addEventListener('click', async function (event) {
-    const { page, pageSize } = await getUrlParams();
+    const {communityId, page, pageSize } = await getUrlParams();
     let currentPage = page;
     if (currentPage > 1) {
-        await updatePosts(--currentPage, pageSize);
+        await updatePosts(communityId, --currentPage, pageSize);
     }
 });
 
 rightPage.addEventListener('click', async function (event) {
-    const { page, pageSize } = await getUrlParams();
+    const {communityId, page, pageSize } = await getUrlParams();
     let currentPage = page;
 
-    await updatePosts(++currentPage, pageSize);
+    await updatePosts(communityId, ++currentPage, pageSize);
 });
 
 firstPage.addEventListener('click', async function (event) {
-    const { page, pageSize } = await getUrlParams();
+    const {communityId, page, pageSize } = await getUrlParams();
     let currentPage = page;
     let difference = parseInt(currentPage) - parseInt(this.innerHTML);
     if (difference > 0) {
         currentPage = parseInt(currentPage) - difference;
         
-        await updatePosts(currentPage, pageSize);
+        await updatePosts(communityId, currentPage, pageSize);
     }
 });
 
 secondPage.addEventListener('click', async function (event) {
-    const { page, pageSize } = await getUrlParams();
+    const {communityId, page, pageSize } = await getUrlParams();
     let currentPage = page;
     let difference = parseInt(this.innerHTML) - parseInt(currentPage);
 
     currentPage = parseInt(currentPage) + difference;
 
-    await updatePosts(currentPage, pageSize);
+    await updatePosts(communityId, currentPage, pageSize);
 });
 
 thirdPage.addEventListener('click', async function (event) {
-    const { page, pageSize } = await getUrlParams();
+    const {communityId, page, pageSize } = await getUrlParams();
     let currentPage = page;
     let difference = parseInt(this.innerHTML) - parseInt(currentPage);
 
     if (difference > 0) {
         currentPage = parseInt(currentPage) + difference;
 
-        await updatePosts(currentPage, pageSize)
+        await updatePosts(communityId, currentPage, pageSize)
     }
 });
-
-export async function updatePosts(currentPage, pageSize){
-    const filters = await getFilters(currentPage, pageSize);
-    await updatePage(currentPage, pageSize,  filters, maxPages);
-    await getCommunityPosts(filters);
-}
