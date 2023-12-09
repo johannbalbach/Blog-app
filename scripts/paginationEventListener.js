@@ -1,4 +1,5 @@
 import { getUrlParams } from "./pagination.js";
+import { updatePosts } from "./views/homepage.js";
 
 const pageSizer = document.getElementById('pageSize');
 const leftPage = document.getElementById('leftPage');
