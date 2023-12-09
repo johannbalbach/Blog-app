@@ -1,13 +1,30 @@
 import {updatePostUI} from "../postCreate.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
+    await updateUI();
+});
+
+async function updateUI(){
     const postID = await getUrlParams();
     const postinfo = await getPost(postID);
 
+    document.getElementById('postsContainer').innerHTML = '';
     await updatePostUI(postinfo, document.getElementById('postsContainer'), true);
 
-    updateCommentsUI(postinfo.comments);
-});
+    await updateCommentsUI(postinfo.comments);
+}
+
+document.getElementById("saveBtn").addEventListener('click', async function(event) {
+    event.preventDefault();
+    const postID = await getUrlParams();
+    const text = document.querySelector("#mainText").value;
+
+    const body = {
+        content: text
+    }
+
+    await commentPost(postID, body);
+  });
 
 async function getPost(id) {
     let URL = `https://blog.kreosoft.space/api/post/${id}`;
@@ -33,6 +50,30 @@ async function getPost(id) {
         return false;
     }
 }
+async function commentPost(id, body) {
+    let URL = `https://blog.kreosoft.space/api/post/${id}/comment`;
+    const token = localStorage.getItem('token');
+    console.log(body);
+    try {
+        const response = await fetch(URL, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            await updateUI();
+        } else {
+            console.error('Ошибка получения поста:', response.status, response.statusText);
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении GET-запроса:', error);
+        return false;
+    }
+}
 
 async function getUrlParams() {
     const url = new URL(window.location);
@@ -41,18 +82,19 @@ async function getUrlParams() {
     return postID;
 }
 
-function updateCommentsUI(commentsArray) {
+async function updateCommentsUI(commentsArray) {
     console.log(commentsArray);
     
-    commentsArray.forEach(comment => {
+    commentsArray.forEach(async comment => {
         const commentContainer = document.getElementById('commentContainer');
-        const commentElement = createCommentElement(comment);
+        commentContainer.innerHTML = '';
+        const commentElement = await createCommentElement(comment);
         commentContainer.appendChild(commentElement);
     });
 }
 
 // Функция для создания элемента комментария
-function createCommentElement(comment) {
+async function createCommentElement(comment) {
     const commentElement = document.createElement('div');
     commentElement.className = "row mt-3 ms-2 me-2"
 
@@ -77,18 +119,17 @@ function createCommentElement(comment) {
     const deleteButton = document.createElement('i');
     deleteButton.className = "fa-solid fa-trash ms-2";
     deleteButton.style = "color: red;";
-    deleteButton.addEventListener('click', () => {
-    // Логика для удаления комментария
+    deleteButton.addEventListener('click', async () => {
+        await sendRequestDelete(comment.id);
     });
 
     actionButtons.appendChild(editButton);
     actionButtons.appendChild(deleteButton);
 
-    if (comment.author == ""){
-        //сделать проверку на автора по имени
+    if (comment.authorId == await GetUserId()){
+        headerElement.appendChild(actionButtons);
     }
-    headerElement.appendChild(actionButtons);
-   
+    
 
     const commentContent = document.createElement('div');
     commentContent.className= "text-dark text-wrap mt-1 mb-1 d-flex"
@@ -120,7 +161,7 @@ function createCommentElement(comment) {
 
     const createDateContent = document.createElement('div');
     createDateContent.className = "text-dark text-wrap mt-2 mb-auto fs-7";
-    createDateContent.textContent = `${formatDateTime(comment.createTime)}`;
+    createDateContent.textContent = `${await formatDateTime(comment.createTime)}`;
     undertextElement.appendChild(createDateContent);    
 
     const replyForm = document.createElement('form');
@@ -141,8 +182,6 @@ function createCommentElement(comment) {
 
     replyForm.appendChild(replyTextArea);
     replyForm.appendChild(submitReplayBtn);
-
-   
     
     const replyBtn = document.createElement('button');
     replyBtn.className = 'btn btn-link mb-auto fs-7';
@@ -175,10 +214,75 @@ function createCommentElement(comment) {
     return commentElement;
 }
 
-function formatDateTime(dateTimeString) {
+async function formatDateTime(dateTimeString) {
     const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
     const dateTime = new Date(dateTimeString);
     const formattedDateTime = dateTime.toLocaleString('en-US', options).replace(/\//g, '.');
 
     return formattedDateTime;
-  }
+}
+
+async function GetUserId()
+{
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(ProfileURL, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+
+            return data.id;
+        } 
+        else {
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении GET-запроса:', error);
+    }
+}
+async function sendRequestDelete(id)
+{
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`https://blog.kreosoft.space/api/comment/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            await updateUI();
+        } 
+        else {
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении GET-запроса:', error);
+    }
+}
+async function sendRequestPUT(body, id) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`https://blog.kreosoft.space/api/comment/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+        });
+
+        if (response.ok) {
+            await updateUI();
+        } else {
+
+        }
+    } catch (error) {
+        console.error('Ошибка сети:', error);
+    }
+}
