@@ -195,7 +195,7 @@ export async function updatePostUI(post, postsContainer, IsthereAddress){
 }
 
 async function goToPost(id){
-    window.location.href = `/post/${id}`;
+    window.location.href = `/post/${id}/#commentContainer`; 
 }
 
 async function handleLike(postId, IsitAdd, likeElement) {
