@@ -2,6 +2,10 @@ import {updatePostUI} from "../postCreate.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
     await updateUI();
+
+    if (GetUserId()){
+        document.getElementById('userComment').classList.add('d-none');
+    }
 });
 
 async function updateUI(){
@@ -240,6 +244,9 @@ async function createCommentElement(comment, isitChildComments) {
             replyForm.classList.add('d-none');
         }
     });
+    if (GetUserId()){
+        replyBtn.classList.add('d-none');
+    }
     undertextElement.appendChild(replyBtn);
     flexcolumn.appendChild(undertextElement);
     commentElement.appendChild(flexcolumn);
@@ -299,11 +306,13 @@ async function GetUserId()
             return data.id;
         } 
         else {
+            return false;
         }
     } catch (error) {
         console.error('Ошибка при выполнении GET-запроса:', error);
     }
 }
+
 async function sendRequestDelete(id)
 {
     try {

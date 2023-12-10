@@ -85,14 +85,37 @@ async function fetchPosts(filters) {
 
 
 async function updateWritePostBtn(){
-    email = document.querySelector('#navbarDropdown').textContent || '';//поменять проверку
-
-    console.log(email);
-    if (email != ''){
+    if (GetUserId()){
         document.getElementById('PostBtn').classList.remove("d-none");
     }
+    document.getElementById('PostBtn').addEventListener('click', async function (event) {
+        window.location.href = "/writepost";
+    })
 }
 
+async function GetUserId()
+{
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch("https://blog.kreosoft.space/api/account/profile", {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+
+            return data.id;
+        } 
+        else {
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении GET-запроса:', error);
+    }
+}
 
 function generateApiUrl(filters) {
     const baseUrl = "https://blog.kreosoft.space/api/post";

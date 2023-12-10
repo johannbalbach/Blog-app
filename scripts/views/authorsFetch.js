@@ -50,15 +50,15 @@ async function createAuthorRow(authors) {
         })
 
         const avatarCol = document.createElement("div");
-        avatarCol.classList.add("col-sm-2", "col-xxl-1", "col-xl-1", "justify-content-center");
+        avatarCol.className = "col-sm-2 col-md-1 col-xxl-1 col-xl-1 d-flex align-items-center justify-content-center position-relative text-center";
 
         const avatarImg = document.createElement("img");
         if (author.gender == "Male"){
-            avatarImg.src = "http://127.0.0.1:5500/views/images/manicon.jpg";
+            avatarImg.src = "/views/images/manicon.jpg";
             avatarImg.alt = "Male Avatar";
         }
         else{
-            avatarImg.src = "http://127.0.0.1:5500/views/images/member-dafault-w.jpeg";
+            avatarImg.src = "/views/images/member-dafault-w.jpeg";
             avatarImg.alt = "Female Avatar";
         }
        
@@ -67,12 +67,23 @@ async function createAuthorRow(authors) {
         avatarImg.height = 75;
 
         if (topAuthors.some(topAuthor => topAuthor.fullName === author.fullName && topAuthor.birthDate === author.birthDate)) {
-            const crown = document.createElement("i");
-            crown.className = "fa-solid fa-crown";
-            avatarCol.appendChild(crown);
-        }
-        
+            const crownImg = document.createElement("img");
+            if (topAuthors[0].fullName === author.fullName && topAuthors[0].birthDate === author.birthDate){
+                crownImg.src = "/views/images/1crown.png";
+            }
+            if (topAuthors[1].fullName === author.fullName && topAuthors[1].birthDate === author.birthDate){
+                crownImg.src = "/views/images/2crown.png";
+            }
+            if (topAuthors[2].fullName === author.fullName && topAuthors[2].birthDate === author.birthDate){
+                crownImg.src = "/views/images/3crown.png";
+            }
+            crownImg.style.transform = 'rotate(45deg)';
+            crownImg.className = "position-absolute bottom-50 start-50";
+            crownImg.width = 65;
+            crownImg.height = 65;
 
+            avatarCol.appendChild(crownImg);
+        }
         avatarCol.appendChild(avatarImg);
 
         const detailsCol = document.createElement("div");
