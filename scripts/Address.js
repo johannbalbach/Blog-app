@@ -39,3 +39,26 @@ function getObjectText(object) {
         return temp;
     }
   }
+
+  async function getAddressSearch(id, query) {
+    let URL = `https://blog.kreosoft.space/api/address/search?parentObjectId=${id}&query=${query}`;
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            const info = await response.json();
+
+            return info;
+        } else {
+            console.error('Ошибка получения поста:', response.status, response.statusText);
+            return false;
+        }
+    } catch (error) {
+        console.error('Ошибка при выполнении GET-запроса:', error);
+        return false;
+    }
+}
