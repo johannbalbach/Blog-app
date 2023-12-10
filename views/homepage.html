@@ -1,0 +1,98 @@
+<div class="container-md col-md-8 mt-1 mb-4">
+    <div class="row mt-3 justify-content-end mb-2">
+        <div class="col-auto">  
+            <button type="submit" class="btn btn-primary d-none" id="PostBtn" >Написать пост</button>
+        </div>
+    </div>
+    <div class="container-md col-auto rounded-3 border border-2 mb-4">
+        <div class="row bg-light mb-3 border-bottom border-2">
+            <div class="text-dark mt-1 mb-1">Фильтры</div>
+        </div>
+        <form id="filterForm" novalidate class="needs-validation">
+            <div class="row mb-2">
+                <div class="col-md-6 ">
+                    <label for="authorName" class="form-label">Поиск по имени автора</label>
+                    <input class="form-control" id="authorName" placeholder="имя_автора">
+                </div>
+                <div class="col-md-6">
+                    <label for="tags" class="form-label">Поиск по тэгам</label>
+                    <select class="form-select" multiple aria-label="multiple select example" id="tags">
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6 col-lg-4 mb-2 mt-auto">
+                    <label for="sorting" class="form-label">Сортировать</label>
+                    <select class="form-select" id="sorting" autocompleted="">
+                        <option value="0" selected>---</option>
+                        <option value="CreateDesc">По дате создания(сначала новые)</option>
+                        <option value="CreateAsc">По дате создания(сначала старые)</option>
+                        <option value="LikeAsc">По лайкам(сначала наименьшие)</option>
+                        <option value="LikeDesc">По лайкам(сначала наибольшие)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-lg-2 mb-2 mt-auto">
+                    <label for="readingTimeFrom" class="form-label">Время чтения от</label>
+                    <input  class="form-control" id="readingTimeFrom" pattern="^\d*$">
+                    <div class="invalid-feedback">Пожалуйста, введите корректное время.</div>
+                </div>
+                <div class="col-md-3 col-lg-2 mb-2 mt-auto">
+                    <label for="readingTimeTo" class="form-label">Время чтения до</label>
+                    <input class="form-control" id="readingTimeTo" pattern="^\d*$">
+                    <div class="invalid-feedback">Пожалуйста, введите корректное время.</div>
+                </div>
+                <div class="col-md-auto mt-auto mb-2 mt-auto">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="onlyMyCommunities">
+                        <label class="form-check-label" for="onlyMyCommunities">Только мои группы</label>
+                    </div>
+                </div>
+                <div class="col-md-auto mb-2 mt-auto justify-content-end">
+                    <div class="col-auto col-12">  
+                        <button type="submit" class="btn btn-primary" id="FilterBtn">Применить</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="postsContainer"> </div>
+    <div class="row mb-6">
+        <ul class="pagination col-6 mt-auto mb-0" id="pagination">
+            <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous" id="leftPage">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+            </li>
+            <li class="page-item"><span class="page-link" href="#"  id="firstPage">1</span></li>
+            <li class="page-item" ><a class="page-link" href="#" id="secondPage">2</a></li>
+            <li class="page-item" ><a class="page-link" href="#" id="thirdPage">3</a></li>
+            <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next" id="rightPage">
+                <span aria-hidden="true" >&raquo;</span>
+            </a>
+            </li>
+        </ul>
+        <div class="col-6 justify-content-end mt-auto mb-auto" id="pageSizeContainer">
+            <label for="pageSize" class="form-label"> Число постов на странице:</label>
+            <select id="pageSize" class="form-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="5" selected>5</option>
+                <option value="8">8</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar align-bottom bg-light border-top border-3 mt-5">
+    <span class="navbar-text ms-5">© 2022 – Блог №415</span>
+</nav>
+
+<script type="module" src="/scripts/views/homepage.js"></script>
+<script type="module" src="/scripts/paginationEventListener.js"></script>

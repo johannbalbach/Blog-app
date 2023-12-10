@@ -1,0 +1,27 @@
+<div class="container-md d-flex justify-content-center align-items-center" style="height: 75vh;">
+    <div class="container-md col-md-9 col-lg-7 col-x  l-6 col-xxl-5 shadow p-3 mb-6 rounded-3">
+        <div class="col-12">
+            <div class="mb-6 fs-2">Вход</div>
+            <form id="loginForm" class="needs-validation" novalidate>
+                <div class="form-group mb-3">
+                  <label for="email">Email:</label>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                  <div class="invalid-feedback">Пожалуйста, введите корректный email.</div>
+                </div>  
+                <div class="form-group mb-3">
+                  <label for="password">Пароль:</label>
+                  <input type="password" class="form-control" id="password" pattern = "^(?=.*\d).{6,}$" name="password" required>
+                  <div class="invalid-feedback">Пожалуйста, введите пароль.</div>
+                </div>
+                <button type="submit1" class="btn btn-primary mb-3 col-12" id ="loginBtnMain" >Войти</button>
+                <button type="button" onclick="window.location.href = '/registration';" class="btn btn-secondary mb-3 col-12" id="registerBtn" >Зарегистрироваться</button>
+              </form>         
+        </div>
+    </div>
+</div>
+
+<nav class="navbar fixed-bottom bg-light border-top border-3 mt-5">
+    <span class="navbar-text ms-5">© 2022 – Блог №415</span>
+</nav>
+
+<script src="/scripts/views/loginFetch.js"></script>

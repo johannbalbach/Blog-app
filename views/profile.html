@@ -1,0 +1,81 @@
+<div class="container-md col-md-7 justify-content-start align-items-start mt-5">
+    <div class="container-md shadow p-3 mb-6 rounded-3">
+        <div class="col-12">
+            <form id="profileForm" class="needs-validation" novalidate>
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="email">Email:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="email" class="form-control" id="email" name="email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                        <div class="invalid-feedback">
+                            <div class="col-12 mb-2">Пожалуйста, введите корректный email.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="fullName">ФИО:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" class="form-control" id="fullName" name="fullName" required>
+                        <div class="invalid-feedback">
+                            <div class="col-12 mb-2">Пожалуйста, введите корректный ФИО.</div>
+                        </div>
+                    </div>
+                </div>        
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="phoneNumber">Номер телефона:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input class="form-control" id="phoneNumber" name="phoneNumber" 
+                        pattern="^(?:\+\d{1,})?(?:\s*\d{1,4}|\(\d{1,4}\))?(?:\s*\d{1,4}|\(\d{1,4}\))?(?:\s*\d{1,2}|\(\d{1,2}\))?(?:\s*\d{1,2}|\(\d{1,2}\))?(?:\s*\d{1,2}|\(\d{1,2}\))?\d{0,}$"
+                        required>
+                        <div class="invalid-feedback">
+                            <div class="col-12 mb-2">Пожалуйста, введите корректный номер телефона.</div>
+                        </div>
+                    </div>
+                </div>    
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="gender">Пол:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select class="form-control" id="gender" name="gender">
+                            <option value="Male">Мужской</option>
+                            <option value="Female">Женский</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            <div class="col-12 mb-2">Пожалуйста, введите корректный гендер.</div>
+                        </div>
+                    </div>
+                </div>    
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <label for="dob">Дата рождения:</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="date" class="form-control" id="dob" name="dob" pattern="^(19\d\d|20\d\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" required>
+                        <div class="invalid-feedback">
+                            <div class="col-12 mb-2">Пожалуйста, введите корректную дату рождения.</div>
+                        </div>
+                    </div>
+                </div>             
+                <div class="row mt-3 justify-content-end">
+                    <div class="col-md-auto">  
+                        <button type="submit" class="btn btn-primary" id="saveBtn">Сохранить</button>
+                    </div>
+                </div>           
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar fixed-bottom bg-light border-top border-3 mt-5">
+    <span class="navbar-text ms-5">© 2022 – Блог №415</span>
+</nav>
+
+<script src="/scripts/views/profileFetch.js"></script>
+
+

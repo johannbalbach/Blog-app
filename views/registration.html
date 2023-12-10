@@ -1,0 +1,62 @@
+<div class="container-md  d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container-md col-md-9 col-lg-7 col-xl-6 col-xxl-5 shadow p-3 mb-6">
+        <div class="col-12">
+            <div class="mb-6 fs-2"> Регистрация </div>
+            <form id="registerForm" class="needs-validation" novalidate>
+                <div class="form-group mb-3">
+                    <label for="fullName">ФИО:</label>
+                    <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Иванов Иван Иванович" required>
+                    <div class="invalid-feedback">
+                        <div class="col-12 mb-2">Пожалуйста, введите корректный ФИО.</div>   
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="dob">Дата рождения:</label>
+                    <input type="date" class="form-control" id="dob" name="dob" pattern="^(19\d\d|20\d\d)-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" max="2023-12-10" required>
+                    <div class="invalid-feedback">
+                        <div class="col-12 mb-2">Пожалуйста, введите корректную дату рождения.</div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="gender">Пол:</label>
+                    <select class="form-control" id="gender" name="gender" placeholder="Мужской">
+                        <option value="Male">Мужской</option>
+                        <option value="Female">Женский</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        <div class="col-12 mb-2">Пожалуйста, введите корректный гендер.</div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="phoneNumber">Номер телефона:</label>
+                    <input class="form-control" id="phoneNumber" name="phoneNumber" placeholder="+7 (xxx) xxx-xx-xx"
+                    pattern="^\+\d+(?:\s*(?:\d{1,4}|\(\d{1,4}\))){1,5}(?:\s*-\s*\d{2})?$"
+                    required>
+                    <div class="invalid-feedback">
+                        <div class="col-12 mb-2">Пожалуйста, введите корректный номер телефона.</div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                    <div class="invalid-feedback">
+                        <div class="col-12 mb-2">Пожалуйста, введите корректный email.</div>
+                    </div>
+                    <h16> Email будет использован для входа в систему</h16>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="password">Пароль:</label>
+                    <input type="password" class="form-control" id="password" name="password" pattern="^(?=.*\d).{6,}$" required>
+                    <div class="invalid-feedback">Пожалуйста, введите пароль.</div>
+                  </div>
+                <button type="submit" class="btn btn-primary" id="registerBtn">Зарегистрироваться</button> 
+            </form>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar fixed-bottom bg-light border-top border-3 mt-5">
+    <span class="navbar-text ms-5">© 2022 – Блог №415</span>
+</nav>
+
+<script src="/scripts/views/authorizeFetch.js"></script>
