@@ -3,7 +3,7 @@ import {updatePostUI} from "../postCreate.js";
 document.addEventListener("DOMContentLoaded", async function () {
     await updateUI();
 
-    if (GetUserId()){
+    if (GetUserId() == false){
         document.getElementById('userComment').classList.add('d-none');
     }
 });
@@ -244,11 +244,12 @@ async function createCommentElement(comment, isitChildComments) {
             replyForm.classList.add('d-none');
         }
     });
-    if (GetUserId()){
+    if (GetUserId() == false){
         replyBtn.classList.add('d-none');
     }
     undertextElement.appendChild(replyBtn);
     flexcolumn.appendChild(undertextElement);
+
     commentElement.appendChild(flexcolumn);
     commentElement.appendChild(replyForm);
 

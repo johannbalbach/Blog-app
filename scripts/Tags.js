@@ -23,6 +23,11 @@ function UpdateTags(tags){
     const tagMenu = document.getElementById('tags');
     tagMenu.innerHTML = '';
 
+    const emptyTag = document.createElement("option");
+    emptyTag.value = '';
+    emptyTag.textContent = '---';
+    tagMenu.appendChild(emptyTag);
+    
     tags.forEach((tag) => {
         const optionElement = document.createElement("option");
         optionElement.value = tag.id;

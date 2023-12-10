@@ -117,7 +117,7 @@ async function createAdmins(admins) {
 
         adminRow.addEventListener('click', async (e) => {
             console.log("OK");
-            window.location.href = `/homepage?author=${admin.fullName}&page=1&size=5`;
+            window.location.href = `/?author=${admin.fullName}&page=1&size=5`;
         })
 
         const avatarCol = document.createElement("div");
@@ -169,7 +169,7 @@ async function showButton(role){
             const { communityId } = await getUrlParams();
             localStorage.setItem('communityId', communityId);
 
-            window.location.href = '/writepost';
+            window.location.href = '/post/create';
         })
 
         return;
@@ -228,10 +228,18 @@ function generateApiUrl(filters) {
     const baseUrl = `https://blog.kreosoft.space/api/community/${filters.id}/post`;
     const queryParams = [];
 
+  
     if (filters.tags) {
-        filters.tags.forEach(tag => {
-            queryParams.push(`tags=${tag}`);
-        });
+        if (filters.tags.length == 1 && filters.tags[0] == ''){
+            
+        }
+        else{
+            filters.tags.forEach(tag => {
+                if (tag != ''){
+                    queryParams.push(`tags=${tag}`);
+                }
+            });
+        }
     }
     if (filters.sorting !== "" && filters.sorting != "0") {
         queryParams.push(`sorting=${filters.sorting}`);
@@ -275,7 +283,7 @@ document.getElementById("filterForm").addEventListener('submit', async function(
     event.preventDefault();
     event.stopPropagation();
 
-    await updatePosts(communityId, page, pageSize);
+    await updatePosts(communityId, 1, pageSize);
 })
 
 

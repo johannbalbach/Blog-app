@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 
 async function enterBlog(Token) {
     localStorage.setItem('token', Token);
-    window.location.href = '/homepage';
+    window.location.href = '/';
 }
 
 async function sendRequest(body = null) {

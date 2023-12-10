@@ -44,9 +44,9 @@ submitFilter.addEventListener('submit', async function(event) {
     if (!this.checkValidity()) {
         event.stopPropagation();
     } else { 
-    const { page, pageSize } = await getUrlParams();
+    const { pageSize } = await getUrlParams();
 
-    await updatePosts(page, pageSize);
+    await updatePosts(1, pageSize);
     }
 
     this.classList.add('was-validated');
@@ -89,7 +89,7 @@ async function updateWritePostBtn(){
         document.getElementById('PostBtn').classList.remove("d-none");
     }
     document.getElementById('PostBtn').addEventListener('click', async function (event) {
-        window.location.href = "/writepost";
+        window.location.href = "/post/create";
     })
 }
 
@@ -122,9 +122,16 @@ function generateApiUrl(filters) {
     const queryParams = [];
   
     if (filters.tags) {
-      filters.tags.forEach(tag => {
-        queryParams.push(`tags=${tag}`);
-      });
+        if (filters.tags.length == 1 && filters.tags[0] == ''){
+
+        }
+        else{
+            filters.tags.forEach(tag => {
+                if (tag != ''){
+                    queryParams.push(`tags=${tag}`);
+                }
+            });
+        }
     }
     if (filters.authorName !== "") {
       queryParams.push(`author=${filters.authorName}`);

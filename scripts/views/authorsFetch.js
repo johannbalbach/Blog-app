@@ -46,7 +46,7 @@ async function createAuthorRow(authors) {
         authorRow.className = "row mb-3 border-bottom border-3";
 
         authorRow.addEventListener('click', async (e) => {
-            window.location.href = `/homepage?author=${author.fullName}&page=1&size=5`;
+            window.location.href = `/?author=${author.fullName}&page=1&size=5`;
         })
 
         const avatarCol = document.createElement("div");

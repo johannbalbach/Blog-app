@@ -5,7 +5,7 @@ const loginBtn = document.getElementById('loginBtnMain');
 async function enterBlog(Token) {
   localStorage.setItem('token', Token);
 
-  window.location.href = '/homepage';
+  window.location.href = '/';
 }
 
 async function sendRequest(method, url, body = null) {

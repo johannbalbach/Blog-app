@@ -28,6 +28,18 @@ app.get('/:page', (req, res) => {
     res.status(200).send(modifiedContent);
 });
 
+app.get('/post/create', (req, res) => {   
+  const indexContent = fs.readFileSync( path.join(_dirname, '../index.html'), 'utf-8');
+  const postContent = fs.readFileSync(path.join(_dirname, `../views/writepost.html`), 'utf-8');
+
+  // Вставляем содержимое страницы внутрь <main>
+  const modifiedContent = indexContent.replace('<main></main>', `<main>${postContent}</main>`);
+
+  // Отправляем результат
+  res.status(200).send(modifiedContent);
+});
+
+
 app.get('/post/:id', (req, res) => {   
     const indexContent = fs.readFileSync( path.join(_dirname, '../index.html'), 'utf-8');
     const postContent = fs.readFileSync(path.join(_dirname, `../views/post.html`), 'utf-8');
@@ -51,7 +63,16 @@ app.get('/communities/:id', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(_dirname, '../index.html'));
+    const indexPath = path.join(_dirname, '../index.html');
+    const indexContent = fs.readFileSync(indexPath, 'utf-8');
+
+    const pagePath = path.join(_dirname, `../views/homepage.html`);
+    const pageContent = fs.readFileSync(pagePath, 'utf-8');
+
+    const modifiedContent = indexContent.replace('<main></main>', `<main>${pageContent}</main>`);
+  
+    // Отправляем результат
+    res.status(200).send(modifiedContent);
 });
 
 app.listen(port, () => {
