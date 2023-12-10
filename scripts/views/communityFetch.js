@@ -5,13 +5,17 @@ import {updateActivePage} from "../pagination.js";
 import {updatePagination} from "../pagination.js";
 import {getFiltersFromURL} from "../pagination.js";
 import { getUrlParams } from "../pagination.js";
+import { handleUnsubscribe } from "../subscribeHandler.js";
+import { handleSubscribe } from "../subscribeHandler.js";
+
 const pageSizer = document.getElementById('pageSize');
 const leftPage = document.getElementById('leftPage');
 const rightPage = document.getElementById('rightPage');
 const firstPage = document.getElementById('firstPage');
 const secondPage = document.getElementById('secondPage');
 const thirdPage = document.getElementById('thirdPage');
-
+const subscribeBtn = document.getElementById('subscribeBtn');
+const unsubscribeBtn = document.getElementById('unsubscribeBtn');
 
 let maxPages = 1;
 
@@ -93,10 +97,9 @@ async function getConcreteCommunity(id){
 }
 
 async function updateCommunityUI(info, id){
-
     document.getElementById('communityName').innerHTML = `Группа "${info.name}"`;
 
-    await showButton(await getRoleInCommunity(id), subscribeBtn, unsubscribeBtn);
+    await showButton(await getRoleInCommunity(id));
     
     document.getElementById('communitySubscribers').innerHTML = `${info.subscribersCount} подписчиков`;
     document.getElementById('communityType').innerHTML = `Тип сообщества: ${info.isClosed ? "закрытая" : "открытая"}`;
@@ -113,7 +116,8 @@ async function createAdmins(admins) {
         }
 
         adminRow.addEventListener('click', async (e) => {
-            window.location.href = `/homepage?author=${author.fullName}&page=1&size=5`;
+            console.log("OK");
+            window.location.href = `/homepage?author=${admin.fullName}&page=1&size=5`;
         })
 
         const avatarCol = document.createElement("div");
@@ -156,8 +160,18 @@ async function createAdmins(admins) {
     });
 }
 
-async function showButton(role, subscribeBtn, unsubscribeBtn){
+async function showButton(role){
     if (role == "Administrator"){
+        const writepostBtn = document.getElementById("writepostBtn");
+        writepostBtn.classList.remove("d-none");
+        writepostBtn.parentElement.parentElement.className = "col-5";
+        writepostBtn.addEventListener('click', async (event) =>{
+            const { communityId } = await getUrlParams();
+            localStorage.setItem('communityId', communityId);
+
+            window.location.href = '/writepost';
+        })
+
         return;
     }
     if (role == "Subscriber"){
@@ -317,4 +331,22 @@ thirdPage.addEventListener('click', async function (event) {
 
         await updatePosts(communityId, currentPage, pageSize)
     }
+});
+
+subscribeBtn.addEventListener("click", async () => {
+    unsubscribeBtn.className = "btn btn-danger ms-5";
+    subscribeBtn.className = "btn btn-primary ms-5 d-none";
+
+    const {communityId} = await getUrlParams();
+
+    await handleSubscribe(communityId);
+});
+
+unsubscribeBtn.addEventListener("click", async () => {
+    subscribeBtn.className = "btn btn-primary ms-5";
+    unsubscribeBtn.className = "btn btn-danger ms-5 d-none";
+
+    const {communityId} = await getUrlParams();
+
+    await handleUnsubscribe(communityId);
 });

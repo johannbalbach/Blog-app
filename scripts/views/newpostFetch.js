@@ -14,9 +14,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (capableCommunities.length > 0){
         await updateCommunitiesUI(capableCommunities);
     }
+
+    const communityId = localStorage.getItem('communityId');
+    if (communityId) {
+        const communitiesSelect = document.getElementById('communities');
+    
+        const optionToSelect = Array.from(communitiesSelect.options).find(option => option.value == communityId);
+        if (optionToSelect) {
+          optionToSelect.selected = true;
+        }
+    
+        localStorage.removeItem('communityId'); // Опционально: очистите значение после использования
+    }
 });
 
 PostForm.addEventListener('submit', async function(event) {
+    console.log("SMTH");
     event.preventDefault(); // предотвращает перезагрузку страницы при отправке формы
     if (!this.checkValidity()) {
       event.stopPropagation();
@@ -26,7 +39,7 @@ PostForm.addEventListener('submit', async function(event) {
         const readingTime = document.querySelector('#readingTime').value || 0;
         const communities = document.querySelector('#communities').value;
         const mainText = document.querySelector('#mainText').value;
-        const image = document.querySelector('#image').value;
+        const image = document.querySelector('#image').value || '';
 
         const body = {
             title: postName,
@@ -40,9 +53,8 @@ PostForm.addEventListener('submit', async function(event) {
             delete body.image;
         }
 
-        createPost(body, communities);
-
-        location.reload();
+        console.log(body, image);
+        await createPost(body, communities);
     }
   
     this.classList.add('was-validated');
@@ -91,16 +103,23 @@ async function createPost(body, id) {
         });
 
         if (response.ok) {
-            const info = await response.json();
-
-            return info;
+            location.reload();
         } else {
             console.error('Ошибка создания поста:', response.status, response.statusText);
-            return false;
+
+            const saveBtn = document.getElementById("saveBtn");
+            // неправильный email или пароль
+            saveBtn.classList.add('error-animation');
+            saveBtn.style.backgroundColor = 'red';
+            saveBtn.style.borderColor = 'red'
+            setTimeout(() => {
+                saveBtn.classList.remove('error-animation');
+                saveBtn.style.backgroundColor = '';
+                saveBtn.style.borderColor = ''
+            }, 1000);
         }
     } catch (error) {
         console.error('Ошибка при выполнении GET-запроса:', error);
-        return false;
     }
 }
 
@@ -169,10 +188,10 @@ async function updateCommunitiesUI(communitiesList){
     communities.parentElement.classList.remove('d-none');
 
     communities.innerHTML = '<option value="0" selected>---</option>';
-    communitiesList.forEach(async (community) => {
+    for (const community of communitiesList) {
         const optionElement = document.createElement("option");
         optionElement.value = community.communityId;
         optionElement.textContent = (await getConcreteCommunities(community.communityId)).name;
         communities.appendChild(optionElement);
-    })
+      }
 }

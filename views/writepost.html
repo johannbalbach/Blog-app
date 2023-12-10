@@ -40,7 +40,7 @@
             <div class="row mb-2">
                 <div class="col-12 mb-2 mt-auto">
                     <label for="image" class="form-label">Ссылка на картинку</label>
-                    <input type="text" class="form-control" pattern="^(http|https):\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$">
+                    <input type="text" class="form-control" pattern="^(http|https):\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$" id="image">
                     <div class="invalid-feedback">
                         <div class="col-12 mb-2">Пожалуйста, введите корректную ссылку.</div>
                     </div>
@@ -71,4 +71,7 @@
     <span class="navbar-text ms-5">© 2022 – Блог №415</span>
 </nav>
 
-<script src="http://127.0.0.1:5500/scripts/views/newpostFetch.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-0MuLTzl8ZmebD5p84W8VxcFHeGeSxx+ljq/gDDfB9tkB4roTAtuq2ZqGrgIvNmZlnUBpF5WN8ZIFBiY2HcVkDw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-H+K7U5CnXl1x2+qGGuzJrx3lUbqtS0BwxUu9BSz5pkA=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-TSI8Ysm3cjXZ/KLbY7uZ87YbdpZz/7+YYdRu0ki3zTpFW+HxGJ5zF5vY1avq/KzGK1DOiRR+MivvAdNx5XMQbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/scripts/views/newpostFetch.js"></script>
