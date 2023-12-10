@@ -1,3 +1,6 @@
+import { handleSubscribe } from "../subscribeHandler.js";
+import { handleUnsubscribe } from "../subscribeHandler.js";
+
 const requestURL = 'https://blog.kreosoft.space/api/community'
 
 async function fetchCommunities() {
@@ -46,51 +49,6 @@ async function getRoleInCommunity(id) {
     }
 }
 
-async function handleSubscribe(id) {
-    const token = localStorage.getItem('token');
-    const subscribeURL = `https://blog.kreosoft.space/api/community/${id}/subscribe`;
-
-    try {
-        const response = await fetch(subscribeURL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
-            
-        } else {
-            console.error('Ошибка получения данных роли:', response.status, response.statusText);
-        }
-    } catch (error) {
-        console.error('Ошибка при выполнении запроса:', error);
-    }
-}
-
-async function handleUnsubscribe(id) {
-    const token = localStorage.getItem('token');
-    const subscribeURL = `https://blog.kreosoft.space/api/community/${id}/unsubscribe`;
-
-    try {
-        const response = await fetch(subscribeURL, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
-            
-        } else {
-            console.error('Ошибка получения данных роли:', response.status, response.statusText);
-        }
-    } catch (error) {
-        console.error('Ошибка при выполнении запроса:', error);
-    }
-}
-
-
 async function updateCommunitiesUI(communities) {
     const communitiesContainer = document.getElementById("communitiesContainer");
 
@@ -100,17 +58,20 @@ async function updateCommunitiesUI(communities) {
         const communityElement = document.createElement("div");
         communityElement.className = "container-md col-auto rounded-3 bg-light border border-2 mb-4";
 
-        communityElement.addEventListener('click', async (e) =>{
-            window.location.href = `/communities/${community.id}`;
-        })
+
 
         const communityBody = document.createElement("div");
         communityBody.className = "row mt-2";
-        communityBody.innerHTML = `
-            <div class="container-md col-8 mt-3 mb-3 justify-content-start">
-                <div class="text-dark ms-3 fs-4">${community.name}</div>
-            </div>
-        `;
+
+        const communityName = document.createElement("div");
+        communityName.className = "container-md col-8 mt-3 mb-3 justify-content-start"
+        communityName.innerHTML = ` <div class="text-dark ms-3 fs-4">${community.name}</div>`
+
+        communityName.addEventListener('click', async (e) =>{
+            window.location.href = `/communities/${community.id}`;
+        })
+
+        communityBody.appendChild(communityName);
 
         const subscribeBtnContainer = document.createElement("div");
         subscribeBtnContainer.className = "container-md col-2 mt-3 mb-3 me-3 d-flex justify-content-end";

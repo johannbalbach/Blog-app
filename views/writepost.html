@@ -40,7 +40,7 @@
             <div class="row mb-2">
                 <div class="col-12 mb-2 mt-auto">
                     <label for="image" class="form-label">Ссылка на картинку</label>
-                    <input type="text" class="form-control" pattern="^(http|https):\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$">
+                    <input type="text" class="form-control" pattern="^(http|https):\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(\/\S*)?$" id="image">
                     <div class="invalid-feedback">
                         <div class="col-12 mb-2">Пожалуйста, введите корректную ссылку.</div>
                     </div>
@@ -58,7 +58,16 @@
             <div class="row mb-2">
                 <div class="text-dark mt-2 mb-2 fs-3">Адрес</div>
             </div>
-            <div class="row mt-3 mb-3 justify-content-end">
+            <div class="row mb-2" id="AddressContainer">
+                <div class="col-12 mb-3">
+                    <label for="region" class="form-label">Субъект РФ</label>
+                    <select class="form-control" id="region">
+                        <option selected="selected" value="0">---</option>
+                        <option value="1281271">Томская область</option>;
+                      </select>
+                </div>
+            </div>
+            <div class="row mt-3 mb-2 justify-content-end">
                 <div class="col-md-auto">  
                     <button type="submit" class="btn btn-primary" id="saveBtn">Создать пост</button>
                 </div>
@@ -71,4 +80,5 @@
     <span class="navbar-text ms-5">© 2022 – Блог №415</span>
 </nav>
 
-<script src="http://127.0.0.1:5500/scripts/views/newpostFetch.js"></script>
+<script src="/scripts/views/newpostFetch.js" type="module"></script>
+

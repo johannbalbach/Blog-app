@@ -7,8 +7,11 @@ const port = 5500;
 
 const _dirname = __dirname + '/WebFront-Hits-frontend-project-2';
 
-app.get('/:page', (req, res) => {   
-    const page = req.params.page;
+app.use('/scripts', express.static(path.join(_dirname, '../scripts')));
+app.use('/views', express.static(path.join(_dirname, '../views')));
+
+app.get('/:page', (req, res) => {     
+    const page = req.params.page; 
   
     // Отправляем базовую структуру
     const indexPath = path.join(_dirname, '../index.html');
