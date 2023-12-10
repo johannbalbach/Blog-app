@@ -1,6 +1,8 @@
+import { createAddressElement } from "../Address.js";
+
 const PostForm = document.getElementById('newpostForm');
 
-document.addEventListener("DOMContentLoaded", async function () {
+$(document).ready(async function() {
     await GetTags();
     const communities = await getMyCommunities();
     const capableCommunities = [];
@@ -24,12 +26,24 @@ document.addEventListener("DOMContentLoaded", async function () {
           optionToSelect.selected = true;
         }
     
-        localStorage.removeItem('communityId'); // Опционально: очистите значение после использования
+        localStorage.removeItem('communityId');
     }
+
+    // $('#region').select2();
+
+    // $('#region').on('change', async function(e) {
+    //     console.log("Change event fired");
+    //     const AddressContainer = document.getElementById('AddressContainer');
+
+    //     await createAddressElement(this.selectedOptions[0].value, null, AddressContainer);
+    // });
+
 });
 
+
+
+
 PostForm.addEventListener('submit', async function(event) {
-    console.log("SMTH");
     event.preventDefault(); // предотвращает перезагрузку страницы при отправке формы
     if (!this.checkValidity()) {
       event.stopPropagation();
@@ -195,3 +209,4 @@ async function updateCommunitiesUI(communitiesList){
         communities.appendChild(optionElement);
       }
 }
+
